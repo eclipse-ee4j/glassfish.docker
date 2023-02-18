@@ -13,7 +13,7 @@ ENV AS_USER=admin \
     AS_TRACE_BOOTSTRAP=false \
     AS_DEBUG_PORT_ENABLED=false \
     AS_STOP_TIMEOUT=9500 \
-    GLASSFISH_DOWNLOAD_SHA1=6dd06e08a702701ae822d5545656f762369ae51d \
+    GLASSFISH_DOWNLOAD_SHA512=cb8951b5077cc638f54e07b6862a8e59c9e2b783adbccf016bad63d1879f375b433f3f2779e5f78deafc22e7bef267d9f6836b36999e1bded16dfb5735ff529b \
     GLASSFISH_VERSION=7.0.1 \
     PATH_GF_BIN=${PATH_GF_HOME}/bin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
@@ -31,7 +31,7 @@ RUN true \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish.zip.asc glassfish.zip \
     && rm -r "$GNUPGHOME" glassfish.zip.asc \
-    && echo "$GLASSFISH_DOWNLOAD_SHA1 glassfish.zip" | sha1sum --strict --check \
+    && echo "$GLASSFISH_DOWNLOAD_SHA512 glassfish.zip" | sha512sum --strict --check \
     && mkdir -p "${PATH_GF_HOME}" \
     && unzip -q glassfish.zip -d "${PATH_GF_HOME}/.." \
     && rm glassfish.zip \

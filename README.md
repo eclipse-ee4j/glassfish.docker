@@ -45,7 +45,10 @@ See https://www.eclipse.org/legal/epl-2.0/
 3. Create pom.xml in the directory. Use older version as an example, don't forget to change the artifactId.
 4. Create a Dockerfile. Use the latest existing version as an example.
 5. Update GLASSFISH_VERSION in Dockerfile
-6. Update GLASSFISH_DOWNLOAD_SHA1 in Dockerfile - visit https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/ and find the right SHA1 file. The value is the content of the file.
+6. Update GLASSFISH_DOWNLOAD_SHA1 in Dockerfile - download the zip file and compute the hash locally:
+   ```
+   sha512sum glassfish-7.0.1.zip
+   ```
 7. Run the build for changed images: mvn clean verify -pl :<artifactId>,:tests -Dglassfish.version
 
 ### Deprecation
