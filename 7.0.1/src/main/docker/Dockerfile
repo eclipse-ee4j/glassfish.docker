@@ -3,10 +3,10 @@ FROM eclipse-temurin:17-jdk
 EXPOSE 4848 9009 8080 8181 7676 8686 3700 3820 3920 6666
 
 # You should use own credentials and own files! These are just defaults.
-ARG PATH_GF_PASSWORD_FILE_FOR_CHANGE=/password-change.txt
+ARG AS_ADMIN_PASSWORD=admin \
+    PATH_GF_PASSWORD_FILE_FOR_CHANGE=/password-change.txt
 ENV PATH_GF_HOME=/opt/glassfish7
 ENV AS_USER=admin \
-    AS_ADMIN_PASSWORD=admin \
     AS_PASSWORD_FILE=/password.txt \
     AS_TRACE=false \
     AS_TRACE_LOGGING=false \
@@ -38,10 +38,13 @@ RUN true \
     && useradd -l -u 1000 -d "${PATH_GF_HOME}" -s /bin/bash glassfish \
     && echo glassfish:glassfish | chpasswd \
     && echo "Generating password file at ${AS_PASSWORD_FILE} ..." \
+    && set +x \
     && echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}" \
     && echo "AS_ADMIN_PASSWORD=" > "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
     && echo "AS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
     && echo "" >> "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
+    && unset AS_ADMIN_PASSWORD \
+    && set -x \
     && env | sort \
     && asadmin start-domain \
     && asadmin --user ${AS_USER} --passwordfile ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} change-admin-password \
