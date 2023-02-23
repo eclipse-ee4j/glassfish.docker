@@ -1,5 +1,11 @@
 #!/bin/bash
 set -e;
+
+if [ "$1" != 'asadmin' ]; then
+    "$@"
+    exit 0;
+fi
+
 on_exit () {
     EXIT_CODE=$?
     set +e;
@@ -9,4 +15,4 @@ on_exit () {
 }
 trap on_exit EXIT
 
-env|sort && asadmin start-domain --debug=${AS_DEBUG_PORT_ENABLED} --verbose
+env|sort && "$@"

@@ -11,7 +11,6 @@ ENV AS_USER=admin \
     AS_TRACE=false \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
-    AS_DEBUG_PORT_ENABLED=false \
     AS_STOP_TIMEOUT=9500 \
     GLASSFISH_DOWNLOAD_SHA512=27d9cef982e5380f3e1d8ba1b4c3e9304258ab37e5bac520c7aa9e5ff08d0d6cb49a689134e250ded189e996948f6847046c2b01b1970b54c22f857dc4bd1ef3 \
     GLASSFISH_VERSION=7.0.0 \
@@ -35,8 +34,7 @@ RUN true \
     && mkdir -p "${PATH_GF_HOME}" \
     && unzip -q glassfish.zip -d "${PATH_GF_HOME}/.." \
     && rm glassfish.zip \
-    && useradd -l -u 1000 -d "${PATH_GF_HOME}" -s /bin/bash glassfish \
-    && echo glassfish:glassfish | chpasswd \
+    && useradd -r -l -u 1000 -d "${PATH_GF_HOME}" -s /bin/bash glassfish \
     && echo "Generating password file at ${AS_PASSWORD_FILE} ..." \
     && set +x \
     && echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}" \
@@ -62,3 +60,4 @@ RUN true \
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
 ENTRYPOINT ["run-glassfish.sh"]
+CMD ["asadmin", "start-domain", "--verbose"]
