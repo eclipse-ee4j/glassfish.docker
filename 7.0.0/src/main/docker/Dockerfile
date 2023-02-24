@@ -18,7 +18,7 @@ ENV AS_USER=admin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"
 
-COPY run-glassfish.sh ${PATH_GF_BIN}/run-glassfish.sh
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN true \
     && set -x \
@@ -54,10 +54,9 @@ RUN true \
     && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} stop-domain \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
-    && chmod +x ${PATH_GF_BIN}/run-glassfish.sh \
-    && ls -la ${PATH_GF_BIN} \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh \
     && echo "Installation was successful."
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
-ENTRYPOINT ["run-glassfish.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["asadmin", "start-domain", "--verbose"]

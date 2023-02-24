@@ -2,8 +2,7 @@
 set -e;
 
 if [ "$1" != 'asadmin' ]; then
-    "$@"
-    exit 0;
+    exec "$@"
 fi
 
 on_exit () {
