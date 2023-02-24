@@ -31,7 +31,7 @@ RUN true \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish.zip.asc glassfish.zip \
-    && rm -r "$GNUPGHOME" glassfish.zip.asc \
+    && rm glassfish.zip.asc \
     && echo "$GLASSFISH_DOWNLOAD_SHA512 glassfish.zip" | sha512sum --strict --check \
     && mkdir -p "${PATH_GF_HOME}" \
     && unzip -q glassfish.zip -d "${PATH_GF_HOME}/.." \
