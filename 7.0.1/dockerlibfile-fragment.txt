@@ -1,0 +1,3 @@
+Tags: 7.0.1, 7.0.1-jdk17, 7.0.1-jdk17-eclipse-temurin
+Architectures: amd64
+Directory: 7.0.1

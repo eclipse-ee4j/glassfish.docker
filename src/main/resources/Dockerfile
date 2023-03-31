@@ -14,8 +14,8 @@ ENV AS_USER=admin \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
     AS_STOP_TIMEOUT=9500 \
-    GLASSFISH_DOWNLOAD_SHA512=cb8951b5077cc638f54e07b6862a8e59c9e2b783adbccf016bad63d1879f375b433f3f2779e5f78deafc22e7bef267d9f6836b36999e1bded16dfb5735ff529b \
-    GLASSFISH_VERSION=7.0.1 \
+    GLASSFISH_DOWNLOAD_SHA512=@glassfish.zip.sha512@ \
+    GLASSFISH_VERSION=@glassfish.version@ \
     PATH_GF_BIN=${PATH_GF_HOME}/bin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"
@@ -26,8 +26,8 @@ RUN true \
     && set -x \
     && apt update \
     && apt install -y gpg unzip \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/$GLASSFISH_VERSION/glassfish-$GLASSFISH_VERSION.zip.asc" -o glassfish.zip.asc \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/$GLASSFISH_VERSION/glassfish-$GLASSFISH_VERSION.zip" -o glassfish.zip \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip.asc" -o glassfish.zip.asc \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip" -o glassfish.zip \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish.zip.asc glassfish.zip \

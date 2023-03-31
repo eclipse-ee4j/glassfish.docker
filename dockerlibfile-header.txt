@@ -1,0 +1,6 @@
+Maintainers: David Matejcek <david.matejcek@omnifish.ee> (@dmatej),
+             Arjan Tijms <arjan.tijms@omnifish.ee> (@arjantijms),
+             Ondro Mihalyi <ondro.mihalyi@omnifish.ee> (@ondromih)
+GitRepo: https://github.com/OmniFish-EE/docker-library-glassfish.git
+GitFetch: refs/heads/main
+GitCommit: REPLACE_ME
