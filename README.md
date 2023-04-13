@@ -47,7 +47,7 @@ See https://www.eclipse.org/legal/epl-2.0/
   The reason is that Official Docker Images use just and only Dockerfiles from this repository,
   but before we push them out, we already wanna know that they are correct.
 
-### New Version
+### New Version in Docker Official Images
 
 1. Run the build for changed images, example:
    ```
@@ -59,6 +59,23 @@ See https://www.eclipse.org/legal/epl-2.0/
    * Don't forget to update the `GitCommit` line with the commit id
    * Don't forget to add the `latest` tag to the latest version (as the first one) and remove it
      from the previous version.
+
+### New Version in an Own Repository
+
+Sometimes you need a customized version. OmniFish decided to push it's images to its own repository until Docker Hub decides to merge our PR.
+
+1. Update what you like
+   *. Especially check the Dockerfile's base image version, JDK version.
+2. Build the image, perhaps also with other parameters:
+   ```
+   mvn clean verify -Dglassfish.version=7.0.3 -Ddocker.glassfish.repository=myrepo/glassfish4myproject -Ddocker.noCache=true -Ddocker.glassfish.tag=7.0.3.CUST4MYPROJECT
+   ```
+3. Deploy the image:
+   ```
+   docker login # will ask for your username and password
+   docker push myrepo/glassfish4myproject:7.0.3.CUST4MYPROJECT
+   docker logout
+   ```
 
 ### Deprecation
 

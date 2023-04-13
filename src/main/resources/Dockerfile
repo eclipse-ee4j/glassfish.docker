@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM @docker.baseImage@
 
 EXPOSE 4848 9009 8080 8181 7676 8686 3700 3820 3920 6666
 

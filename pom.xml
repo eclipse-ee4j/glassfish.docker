@@ -10,6 +10,7 @@
     <name>Glassfish Docker Image Distribution</name>
 
     <properties>
+        <docker.baseImage>eclipse-temurin:17.0.6_10-jdk</docker.baseImage>
         <glassfish.version>7.0.3</glassfish.version>
         <docker.glassfish.repository>glassfish</docker.glassfish.repository>
         <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
