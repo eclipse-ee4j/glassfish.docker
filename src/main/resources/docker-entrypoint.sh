@@ -14,4 +14,4 @@ on_exit () {
 }
 trap on_exit EXIT
 
-env|sort && "$@"
+env|sort && "$@" & wait
