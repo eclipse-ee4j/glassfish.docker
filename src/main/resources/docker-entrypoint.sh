@@ -14,4 +14,6 @@ on_exit () {
 }
 trap on_exit EXIT
 
+rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus || true
+
 env|sort && "$@" & wait
