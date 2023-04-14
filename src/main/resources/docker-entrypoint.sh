@@ -14,6 +14,11 @@ on_exit () {
 }
 trap on_exit EXIT
 
-rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus || true
+CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED_PLACEHOLDER"
+if [ ! -f "$CONTAINER_ALREADY_STARTED" ]
+then
+    touch "$CONTAINER_ALREADY_STARTED" &&
+    rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus || true
+fi
 
 env|sort && "$@" & wait
