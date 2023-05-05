@@ -47,14 +47,16 @@ RUN true \
     && unset AS_ADMIN_PASSWORD \
     && set -x \
     && env | sort \
-    && asadmin start-domain \
+    && AS_START_TIMEOUT=120000 asadmin start-domain \
+    && curl  -o /dev/null http://localhost:4848 \
     && asadmin --user ${AS_USER} --passwordfile ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} change-admin-password \
     && asadmin stop-domain --kill \
-    && asadmin start-domain \
+    && AS_START_TIMEOUT=120000 asadmin start-domain \
+    && curl  -o /dev/null http://localhost:4848 \
     && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} set-log-attributes org.glassfish.main.jul.handler.GlassFishLogHandler.enabled=false \
     && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} set-log-attributes org.glassfish.main.jul.handler.SimpleLogHandler.level=FINEST \
     && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} enable-secure-admin \
-    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} stop-domain \
+    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
     && chmod +x /usr/local/bin/docker-entrypoint.sh \

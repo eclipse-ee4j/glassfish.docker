@@ -15,6 +15,7 @@
         <docker.glassfish.repository>glassfish</docker.glassfish.repository>
         <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
         <docker.glassfish.image>${docker.glassfish.repository}:${docker.glassfish.tag}</docker.glassfish.image>
+        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
     </properties>
 
     <build>
@@ -149,6 +150,11 @@
                         <image>
                             <name>${docker.glassfish.repository}</name>
                             <build>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platforms}</platform>
+                                    </platforms>
+                                </buildx>
                                 <tags>
                                     <tag>${docker.glassfish.tag}</tag>
                                 </tags>
