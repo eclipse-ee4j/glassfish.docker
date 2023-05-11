@@ -1,4 +1,4 @@
-# Glassfish Full Profile Docker Image Distribution
+# OmniFish's Eclipse Glassfish Full Profile Docker Image Distribution
 
 ## Table of Contents
 
@@ -8,7 +8,7 @@ The original official GlassFish image was created in 2014 by the AWS under the E
 and contained Oracle GlassFish distributions version 4.0 and 4.1. However later the official image
 was abandoned and marked as deprecated.
 
-Since 2023 the official support is provided by the company OmniFish, which is highly active
+Since 2023 the commercial support is provided by the company OmniFish, which is highly active
 in the Eclipse GlassFish project and also Jakarta EE.
 In fact the individual developers of the company supported the Eclipse GlassFish long before
 they created the OmniFish company.
