@@ -7,9 +7,11 @@ ARG AS_ADMIN_PASSWORD=admin \
     PATH_GF_PASSWORD_FILE_FOR_CHANGE=/password-change.txt \
     UID=1000 \
     GID=1000
-ENV PATH_GF_HOME=/opt/glassfish7
-ENV AS_USER=admin \
-    AS_PASSWORD_FILE=/password.txt \
+ENV PATH_GF_HOME=/opt/glassfish7 \
+    AS_ADMIN_USER=admin \
+    AS_ADMIN_PASSWORDFILE=/password.txt
+ENV AS_USER=${AS_ADMIN_USER} \
+    AS_PASSWORD_FILE=${AS_ADMIN_PASSWORDFILE} \
     AS_TRACE=false \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
@@ -49,14 +51,14 @@ RUN true \
     && env | sort \
     && AS_START_TIMEOUT=120000 asadmin start-domain \
     && curl  -o /dev/null http://localhost:4848 \
-    && asadmin --user ${AS_USER} --passwordfile ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} change-admin-password \
+    && asadmin --passwordfile ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} change-admin-password \
     && asadmin stop-domain --kill \
     && AS_START_TIMEOUT=120000 asadmin start-domain \
     && curl  -o /dev/null http://localhost:4848 \
-    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} set-log-attributes org.glassfish.main.jul.handler.GlassFishLogHandler.enabled=false \
-    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} set-log-attributes org.glassfish.main.jul.handler.SimpleLogHandler.level=FINEST \
-    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} enable-secure-admin \
-    && asadmin --user ${AS_USER} --passwordfile ${AS_PASSWORD_FILE} stop-domain --kill \
+    && asadmin set-log-attributes org.glassfish.main.jul.handler.GlassFishLogHandler.enabled=false \
+    && asadmin set-log-attributes org.glassfish.main.jul.handler.SimpleLogHandler.level=FINEST \
+    && asadmin enable-secure-admin \
+    && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
     && chmod +x /usr/local/bin/docker-entrypoint.sh \
