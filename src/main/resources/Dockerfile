@@ -64,4 +64,4 @@ RUN true \
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["asadmin", "start-domain", "--verbose"]
+CMD ["startserv"]
