@@ -59,10 +59,11 @@ See https://www.eclipse.org/legal/epl-2.0/
    * Don't forget to update the `GitCommit` line with the commit id
    * Don't forget to add the `latest` tag to the latest version (as the first one) and remove it
      from the previous version.
+4. Visit the `docker-library/docs` repository and replace the contents of the `glassfish` directory with the contents of the `target/classes/docs` directory
 
 ### New Version in an Own Repository
 
-Sometimes you need a customized version. OmniFish decided to push it's images to its own repository until Docker Hub decides to merge our PR.
+Sometimes you need a customized version. OmniFish decided to push its images to its own repository until Docker Hub decides to merge our PR.
 
 1. Update what you like
    *. Especially check the Dockerfile's base image version, JDK version.
@@ -76,6 +77,8 @@ Sometimes you need a customized version. OmniFish decided to push it's images to
    docker push myrepo/glassfish4myproject:7.0.3.CUST4MYPROJECT
    docker logout
    ```
+4. Repeat the steps 2 and 3 for the `latest` tag
+5. Update the description of the Docker image in the repository with the contents of the file `target/classes/docs/content.md`
 
 ### Deprecation
 
