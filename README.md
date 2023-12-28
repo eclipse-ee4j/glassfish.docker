@@ -51,7 +51,7 @@ See https://www.eclipse.org/legal/epl-2.0/
 
 1. Run the build for changed images, example:
    ```
-   mvn clean verify -Dglassfish.version=7.0.3
+   mvn clean verify -Dglassfish.version=7.0.11
    ```
 2. Commit and push
 3. Visit the `docker-library/official-images` repository and replace the `library/glassfish` file
@@ -69,12 +69,12 @@ Sometimes you need a customized version. OmniFish decided to push its images to 
    *. Especially check the Dockerfile's base image version, JDK version.
 2. Build the image, perhaps also with other parameters:
    ```
-   mvn clean verify -Dglassfish.version=7.0.3 -Ddocker.glassfish.repository=myrepo/glassfish4myproject -Ddocker.noCache=true -Ddocker.glassfish.tag=7.0.3.CUST4MYPROJECT
+   mvn clean verify -Dglassfish.version=7.0.11 -Ddocker.glassfish.repository=myrepo/glassfish4myproject -Ddocker.noCache=true -Ddocker.glassfish.tag=7.0.11.CUST4MYPROJECT
    ```
 3. Deploy the image:
    ```
    docker login # will ask for your username and password
-   docker push myrepo/glassfish4myproject:7.0.3.CUST4MYPROJECT
+   docker push myrepo/glassfish4myproject:7.0.11.CUST4MYPROJECT
    docker logout
    ```
 4. Repeat the steps 2 and 3 for the `latest` tag
