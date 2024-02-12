@@ -42,7 +42,7 @@ public class ShaGenerator {
         byte[] bytes = Files.readAllBytes(input);
         BigInteger no = new BigInteger(1, messageDigest.digest(bytes));
         String hashtext = no.toString(16);
-        while (hashtext.length() < 32) {
+        while (hashtext.length() < 128) {
             hashtext = "0" + hashtext;
         }
         Properties props = new Properties();
