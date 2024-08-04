@@ -19,8 +19,9 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: eclipse-glassfish
-
+  IMAGE_NAME: glassfish
+  IMAGE_ID: "ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME"
+  IMAGE_VERSION: 7.0.16
 
 jobs:
   build:
@@ -37,20 +38,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Maven Build
+      - name: Maven Configure
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - run: mvn clean package
+      
+      - name: Maven Build
+        run: mvn clean package -Dglassfish.repository=$IMAGE_ID -Dglassfish.version=$IMAGE_VERSION
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       
       - name: Docker Push
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/eclipse-glassfish
-          VERSION=7.0.16
-          docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$IMAGE_VERSION
           docker push $IMAGE_ID:latest
