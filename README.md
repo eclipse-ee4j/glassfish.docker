@@ -6,9 +6,9 @@
 
 ### Where to Get Help?
 
-* GlassFish Mailing List for questions
-* GlassFish GitHub for well defined and repeatable issues
-* OmniFish Commercial Support for paid active help and other services
+* [GlassFish Mailing List](https://accounts.eclipse.org/mailing-list/glassfish-dev) for questions
+* [GlassFish GitHub](https://github.com/eclipse-ee4j/glassfish) for well defined and repeatable issues
+* [OmniFish Commercial Support](https://omnifish.ee/solutions/#support) for paid active help and other services
 
 ### What About GlassFish 6?
 
