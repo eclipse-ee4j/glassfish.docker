@@ -39,6 +39,7 @@ RUN true \
     && mkdir -p "${PATH_GF_HOME}" \
     && unzip -q glassfish.zip -d "${PATH_GF_HOME}/.." \
     && rm glassfish.zip \
+    && userdel -r ubuntu \
     && groupadd -g ${GID} glassfish \
     && useradd -r -l -u ${UID} -g ${GID} -d "${PATH_GF_HOME}" -s /bin/bash glassfish \
     && echo "Generating password file at ${AS_PASSWORD_FILE} ..." \
