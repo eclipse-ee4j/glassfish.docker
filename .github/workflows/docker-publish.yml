@@ -39,7 +39,7 @@ jobs:
           distribution: 'temurin'
       
       - name: Maven Build
-        run: set -x && mvn -v && mvn clean package -Dglassfish.repository=$IMAGE_ID -Dglassfish.version=$IMAGE_VERSION
+        run: set -x && mvn -v && mvn clean package -Dglassfish.repository=$IMAGE_ID -Dglassfish.version=$IMAGE_VERSION && docker images | sort
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
