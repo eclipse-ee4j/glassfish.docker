@@ -1,4 +1,4 @@
-# Eclipse Glassfish Full Profile Docker Image Distribution
+# Eclipse Glassfish Full Profile Docker Image
 
 ## Table of Contents
 
