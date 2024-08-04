@@ -1,25 +1,6 @@
-# OmniFish's Eclipse Glassfish Full Profile Docker Image Distribution
+# Eclipse Glassfish Full Profile Docker Image Distribution
 
 ## Table of Contents
-
-## Short History of the Official Image
-
-The original official GlassFish image was created in 2014 by the AWS under the Elastic Beanstalk project
-and contained Oracle GlassFish distributions version 4.0 and 4.1. However later the official image
-was abandoned and marked as deprecated.
-
-Since 2023 the commercial support is provided by the company OmniFish, which is highly active
-in the Eclipse GlassFish project and also Jakarta EE.
-In fact the individual developers of the company supported the Eclipse GlassFish long before
-they created the OmniFish company.
-After the release of Eclipse GlassFish 7.0.0 there was a discussion where several users asked
-for the official Eclipse GlassFish Docker Image.
-
-So ... here it is!
-
-## Examples
-
-* Links to examples will be added soon ...
 
 ## FAQ
 
@@ -34,59 +15,10 @@ So ... here it is!
 Eclipse GlassFish 6 contains many changes, however some of important start/stop issues were fixed
 with redesign and refactoring done for Eclipse GlassFish 7. Simply said, 6 is not ready for Docker.
 
+### Why Folder Per Version?
+
+Repository contains copy-pastes. The reason is that Docker Hub Container Image Library uses just and only Dockerfiles from this repository, but before we push them out, we already have to know that they are correct and we have to commit them. DockerHub then links its distribution image to the commit id in this repository.
+
 ## License
 
 See https://www.eclipse.org/legal/epl-2.0/
-
-## Internal: Updates
-
-* The following instructions will be improved, now it is rather expected way.
-* This repository reflects just supported versions.
-* Changes are done here first, then you create a PR for docker-images and a PR for docker-images-docs
-* Repository contains copy-pastes.
-  The reason is that Official Docker Images use just and only Dockerfiles from this repository,
-  but before we push them out, we already wanna know that they are correct.
-
-### New Version in Docker Official Images
-
-1. Run the build for changed images, example:
-   ```
-   mvn clean verify -Dglassfish.version=7.0.12
-   ```
-2. Commit and push
-3. Visit the `docker-library/official-images` repository and replace the `library/glassfish` file
-   with the file from the `target` directory
-   * Don't forget to update the `GitCommit` line with the commit id
-   * Don't forget to add the `latest` tag to the latest version (as the first one) and remove it
-     from the previous version.
-4. Visit the `docker-library/docs` repository and replace the contents of the `glassfish` directory with the contents of the `target/classes/docs` directory
-
-### New Version in an Own Repository
-
-Sometimes you need a customized version. OmniFish decided to push its images to its own repository until Docker Hub decides to merge our PR.
-
-1. Update what you like
-   *. Especially check the Dockerfile's base image version, JDK version.
-2. Build the image, perhaps also with other parameters:
-   ```
-   mvn clean verify -Dglassfish.version=7.0.12 -Ddocker.glassfish.repository=myrepo/glassfish4myproject -Ddocker.noCache=true -Ddocker.glassfish.tag=7.0.12.CUST4MYPROJECT
-   ```
-3. Deploy the image:
-   ```
-   docker login # will ask for your username and password
-   docker push myrepo/glassfish4myproject:7.0.12.CUST4MYPROJECT
-   docker logout
-   ```
-4. Repeat the steps 2 and 3 for the `latest` tag
-5. Update the description of the Docker image in the repository with the contents of the file `target/classes/docs/content.md`
-
-### Deprecation
-
-You don't need to change anything here.
-Visit the docker-images-docs repository, update the README.md file and create a PR.
-
-### Removal
-
-1. Visit the `docker-library/official-images` and remove the block in `library/glassfish` you want to be removed.
-2. Visit the `docker-library/docker-images-docs` repository, update the README.md file and create a PR.
-2. Remove the directory here, then commit and push.
