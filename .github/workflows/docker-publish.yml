@@ -1,0 +1,43 @@
+name: Docker Publish to GitHub
+
+on:
+  workflow_dispatch:
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_ID: "ghcr.io/${{ github.repository_owner }}/glassfish"
+  IMAGE_VERSION: 7.0.16
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Maven Configure
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - name: Maven Build
+        run: set -x && mvn -v && mvn clean package -Dglassfish.version=$IMAGE_VERSION && docker image tag glassfish:$IMAGE_VERSION $IMAGE_ID:$IMAGE_VERSION && docker image tag glassfish:$IMAGE_VERSION $IMAGE_ID:latest && docker images | sort
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+      - name: Docker Push
+        run: |
+          docker push $IMAGE_ID:$IMAGE_VERSION
+          docker push $IMAGE_ID:latest
