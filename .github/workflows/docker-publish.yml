@@ -1,14 +1,7 @@
 name: Docker Publish to GitHub
 
 on:
-  schedule:
-    - cron: '15 23 * * *'
-  push:
-    branches: [ "main" ]
-    # Publish server tags as releases.
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
