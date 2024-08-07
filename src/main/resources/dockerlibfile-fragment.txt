@@ -1,3 +1,3 @@
 Tags: @glassfish.version@, @glassfish.version@-jdk17, @glassfish.version@-jdk17-eclipse-temurin
-Architectures: @docker.platforms@
+Architectures: amd64, arm64v8
 Directory: @glassfish.version@

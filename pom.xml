@@ -16,6 +16,7 @@
         <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
         <docker.glassfish.image>${docker.glassfish.repository}:${docker.glassfish.tag}</docker.glassfish.image>
         <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
@@ -73,7 +74,7 @@
                         <goals>
                             <goal>java</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>process-classes</phase>
                         <configuration>
                             <mainClass>org.glassfish.docker.ShaGenerator</mainClass>
                             <commandlineArgs>${project.build.directory}/glassfish.zip ${project.build.directory}/sha.properties</commandlineArgs>
@@ -107,7 +108,7 @@
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -125,7 +126,7 @@
                         <goals>
                             <goal>resources</goal>
                         </goals>
-                        <phase>process-resources</phase>
+                        <phase>prepare-package</phase>
                         <configuration>
                             <outputDirectory>${basedir}/${docker.glassfish.tag}</outputDirectory>
                         </configuration>
@@ -135,7 +136,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.42.1</version>
+                <version>0.45.0</version>
                 <executions>
                     <execution>
                         <id>build-docker-image</id>
