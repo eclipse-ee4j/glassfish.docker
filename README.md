@@ -1,8 +1,18 @@
 # Eclipse Glassfish Full Profile Docker Image
 
-## Table of Contents
+## Frequently Asked Questions
 
-## FAQ
+### How to Use Eclipse GlassFish Docker Image?
+
+* Try [Examples](https://github.com/eclipse-ee4j/glassfish.docker/wiki/Examples) on our Wiki.
+* Read [Eclipse GlassFish Documentation](https://glassfish.org/documentation.html)
+* Browse Eclipse GlassFish own tests
+  * They don't use the docker image, however these tests use similar principles.
+  * These tests use `glassfish-itest-tools` instead of docker.
+  * [Eclipse GlassFish Application Tests](https://github.com/eclipse-ee4j/glassfish/tree/master/appserver/tests/application/src/test/java/org/glassfish/main/test/app) are covering application compatibility with GlassFish.
+  * [Eclipse GlassFish Admin Tests](https://github.com/eclipse-ee4j/glassfish/tree/master/appserver/tests/admin/tests/src/test/java/org/glassfish/main/admin/test) are covering usage of `asadmin` and the REST Admin Interface.
+* Browse Jakarta EE resources
+  * [Jakarta EE Examples](https://github.com/eclipse-ee4j/jakartaee-examples)
 
 ### Where to Get Help?
 
