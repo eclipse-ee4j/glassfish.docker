@@ -51,15 +51,6 @@ jobs:
           docker buildx ls
           docker buildx imagetools inspect ${{ env.IMAGE_ID }}:latest
 
-      - name: Undeploy Existing Package
-        uses: actions/delete-package-versions@v5
-        with:
-          owner: ${{ github.repository_owner }}
-          package-type: container
-          package-name: glassfish
-          package-version-ids: ${{ env.IMAGE_VERSION }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and Deploy
         uses: docker/build-push-action@v6
         with:
