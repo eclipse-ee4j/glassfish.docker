@@ -1,5 +1,17 @@
 FROM @docker.baseImage@
 
+LABEL org.opencontainers.image.base.name="@docker.baseImage@"
+LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
+LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
+
+LABEL org.opencontainers.image.title="Eclipse GlassFish"
+LABEL org.opencontainers.image.description="The Official Eclipse GlassFish Docker Image"
+LABEL org.opencontainers.image.version="@glassfish.version@"
+
+LABEL org.opencontainers.image.authors="glassfish-dev@eclipse.org"
+LABEL org.opencontainers.image.vendor="Eclipse Foundation"
+LABEL org.opencontainers.image.licenses="EPL-2.0"
+
 EXPOSE 4848 9009 8080 8181 7676 8686 3700 3820 3920 6666
 
 # You should use own credentials and own files! These are just defaults.
