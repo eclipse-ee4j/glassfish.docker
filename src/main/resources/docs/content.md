@@ -4,7 +4,7 @@
 
 %%LOGO%%
 
-**Source code repository of the Docker image:** https://github.com/OmniFish-EE/docker-library-glassfish
+**Source code repository of the Docker image:** https://github.com/eclipse-ee4j/glassfish.docker
 
 ## Quick start
 
@@ -40,6 +40,29 @@ CONTAINER_ID can be found from the output of the following command:
 ```
 docker ps
 ```
+
+### Start GlassFish Embedded
+
+Run GlassFish Embedded runnable JAR (static shell) with the following command:
+
+```
+docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+```
+
+This will run GlassFish static shell JAR from the GlassFish installation, which is equivalent to running a standalone GlassFish Embedded JAR. If no applications are deployed, GlassFish Embedded will start an interactive prompt to input commands. For this to work in Docker, the `-it` arguments are needed.
+
+To display usage instructions, run:
+
+```
+docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+```
+
+To deploy an application, copy the application into the Docker image or mount the directory that contains it, and then pass the path to it as an argument. For example, if the application myapp.war is copied to the default `/opt/glassfish7` directory:
+
+```
+docker run -p 8080:8080 @docker.glassfish.repository@ runembedded myapp.war
+```
+
 
 ## Run an application with GlassFish in Docker
 
@@ -107,6 +130,55 @@ docker logs 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
 ...
 
 docker stop 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
+```
+
+## Running GlassFish Embedded
+
+### Run an application
+
+To deploy an application with GlassFish Embedded, copy the application into the Docker image or mount the directory that contains it, and then pass the path to it as an argument. For example, if the application myapp.war is copied to the default `/opt/glassfish7` directory:
+
+```
+docker run -p 8080:8080 @docker.glassfish.repository@ runembedded myapp.war
+```
+
+You can also just copy applications into the /opt/glassfish7/autodeploy directory or mount a directory with applications to it. All applications in that directory will be automatically deployed. For example, if you have applications on a local directory `/deployments`:
+
+```
+docker run -p 8080:8080 -v /deployments:/opt/glassfish7/autodeploy @docker.glassfish.repository@ runembedded
+```
+
+
+### Configure GlassFish Embedded
+
+You can configure GlassFish Embedded by command line aguments after the command runembedded, or by a configuration file. Several options are supported, for example set a different HTTP port or disable HTTP listener, set path to a custom domain configuration, run asadmin commands at startup, deploy applications.
+
+You can also just create a configuration file called `glassfish.properties` in the default directory `/opt/glassfish7`, with all the options, including commands to execute and applications to deploy. Or specify path to a different configuration file with the `--properties` option.
+
+To display usage instructions, run:
+
+```
+docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+```
+
+This Docker image also supports adding custom Java VM arguments, with the JVM_OPTS environments variable. FOr example, you can specify `-XX:MaxRAMPercentage=75` to set maximum heap size to 75% of RAM:
+
+```
+docker run -it -e JVM_OPTS=="-XX:MaxRAMPercentage=75" -p 8080:8080 @docker.glassfish.repository@ runembedded
+```
+
+
+### Debug with GlassFish Embedded
+
+To enable debugging, you can either add a custom debugging instruction for the JVM with the `JVM_OPTS` variable, or you can set one of the following environment variables to `true`:
+
+* `DEBUG` - enables remove debugger on port 9009, doesn't suspend the server
+* `SUSPEND` - suspends the server right at the startup and continues when a debugger connects on port 9009
+
+Example:
+
+```
+docker run -e SUSPEND=true -p 8080:8080 @docker.glassfish.image@ runembedded
 ```
 
 ## TestContainers

@@ -76,7 +76,9 @@ RUN true \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
     && chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && mkdir ${PATH_GF_HOME}/autodeploy \
     && echo "Installation was successful."
+
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
 ENTRYPOINT ["docker-entrypoint.sh"]
