@@ -13,13 +13,13 @@
 Run GlassFish with the following command:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 glassfish
 ```
 
 Or with a command for a specific tag (GlassFish version):
 
 ```
-docker run -p 8080:8080 -p 4848:4848 @docker.glassfish.image@
+docker run -p 8080:8080 -p 4848:4848 glassfish:7.0.18
 ```
 
 Open the following URLs in the browser:
@@ -46,7 +46,7 @@ docker ps
 Run GlassFish Embedded runnable JAR (static shell) with the following command:
 
 ```
-docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -p 8080:8080 glassfish runembedded
 ```
 
 This will run GlassFish static shell JAR from the GlassFish installation, which is equivalent to running a standalone GlassFish Embedded JAR. If no applications are deployed, GlassFish Embedded will start an interactive prompt to input commands. For this to work in Docker, the `-it` arguments are needed.
@@ -54,13 +54,13 @@ This will run GlassFish static shell JAR from the GlassFish installation, which 
 To display usage instructions, run:
 
 ```
-docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -p 8080:8080 glassfish runembedded
 ```
 
 To deploy an application, copy the application into the Docker image or mount the directory that contains it, and then pass the path to it as an argument. For example, if the application myapp.war is copied to the default `/opt/glassfish7` directory:
 
 ```
-docker run -p 8080:8080 @docker.glassfish.repository@ runembedded myapp.war
+docker run -p 8080:8080 glassfish runembedded myapp.war
 ```
 
 
@@ -75,7 +75,7 @@ Follow these steps:
 3. Run the following command to start GlassFish in Docker with your application, where `/deployments` is path to the directory created in step 1:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 -v /deployments:/opt/glassfish7/glassfish/domains/domain1/autodeploy @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 -v /deployments:/opt/glassfish7/glassfish/domains/domain1/autodeploy glassfish
 ```
 
 Then you can open the application in the browser with:
@@ -89,7 +89,7 @@ The context root (`application`) is derived from the name of the application fil
 You can modify the start command of the Docker container to `startserv --debug` to enable debug mode. You should also map the debug port 9009.
 
 ```
-docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@ startserv --debug
+docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 glassfish startserv --debug
 ```
 
 Then connect your debugger to the port 9009 on `localhost`.
@@ -97,7 +97,7 @@ Then connect your debugger to the port 9009 on `localhost`.
 If you need suspend GlassFish startup until you connect the debugger, use the `--suspend` argument instead:
 
 ```
-docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@ startserv --suspend
+docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 glassfish startserv --suspend
 ```
 
 ## Examples of advanced usage
@@ -107,7 +107,7 @@ Let's try something more complicated.
 * To modify startup arguments for GlassFish, just add `startserv` to the command line and then add any arguments supported by the `asadmin start-domain` command. The `startserv` script is an alias to the `asadmin start-domain` command but starts GlassFish in a more efficient way that is more suitable in Docker container. For example, to start in debug mode with a custom domain, run:
 
 ```bash
-docker run @docker.glassfish.repository@ startserv --debug mydomain
+docker run glassfish startserv --debug mydomain
 ```
 
 * Environment variable `AS_TRACE=true` enables tracing of the GlassFish startup. It is useful when the server doesn't start without any useful logs.
@@ -117,13 +117,13 @@ docker run @docker.glassfish.repository@ startserv --debug mydomain
 * `docker run` with `-d` starts the container as a daemon, so the shell doesn't print logs and finishes. Docker then returns the container id which you can use for further commands.
 
 ```bash
-docker run -d @docker.glassfish.repository@
+docker run -d glassfish
 ```
 
 Example of running a Docker container in background, view the logs, and then stop it (with debug enabled, trace logging, and user `1000` convenient for Kubernetes ):
 
 ```bash
-docker run -d -e AS_TRACE=true --user 1000 @docker.glassfish.repository@ startserv --debug=true
+docker run -d -e AS_TRACE=true --user 1000 glassfish startserv --debug=true
 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
 
 docker logs 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
@@ -139,13 +139,13 @@ docker stop 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
 To deploy an application with GlassFish Embedded, copy the application into the Docker image or mount the directory that contains it, and then pass the path to it as an argument. For example, if the application myapp.war is copied to the default `/opt/glassfish7` directory:
 
 ```
-docker run -p 8080:8080 @docker.glassfish.repository@ runembedded myapp.war
+docker run -p 8080:8080 glassfish runembedded myapp.war
 ```
 
 You can also just copy applications into the /opt/glassfish7/autodeploy directory or mount a directory with applications to it. All applications in that directory will be automatically deployed. For example, if you have applications on a local directory `/deployments`:
 
 ```
-docker run -p 8080:8080 -v /deployments:/opt/glassfish7/autodeploy @docker.glassfish.repository@ runembedded
+docker run -p 8080:8080 -v /deployments:/opt/glassfish7/autodeploy glassfish runembedded
 ```
 
 
@@ -158,13 +158,13 @@ You can also just create a configuration file called `glassfish.properties` in t
 To display usage instructions, run:
 
 ```
-docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -p 8080:8080 glassfish runembedded
 ```
 
 This Docker image also supports adding custom Java VM arguments, with the JVM_OPTS environments variable. FOr example, you can specify `-XX:MaxRAMPercentage=75` to set maximum heap size to 75% of RAM:
 
 ```
-docker run -it -e JVM_OPTS=="-XX:MaxRAMPercentage=75" -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -e JVM_OPTS=="-XX:MaxRAMPercentage=75" -p 8080:8080 glassfish runembedded
 ```
 
 
@@ -178,7 +178,7 @@ To enable debugging, you can either add a custom debugging instruction for the J
 Example:
 
 ```
-docker run -e SUSPEND=true -p 8080:8080 @docker.glassfish.image@ runembedded
+docker run -e SUSPEND=true -p 8080:8080 glassfish:7.0.18 runembedded
 ```
 
 ## TestContainers
@@ -196,7 +196,7 @@ If you want to run more complicated tests, the good path is to
 public class WelcomePageITest {
 
     @Container
-    private final GenericContainer server = new GenericContainer<>("@docker.glassfish.image@").withExposedPorts(8080);
+    private final GenericContainer server = new GenericContainer<>("glassfish:7.0.18").withExposedPorts(8080);
 
     @Test
     void getRoot() throws Exception {
