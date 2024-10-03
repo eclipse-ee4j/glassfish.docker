@@ -1,4 +1,4 @@
-# Eclipse GlassFish Docker images (by OmniFish)
+# Eclipse GlassFish Docker images
 
 [Eclipse GlassFish](https://glassfish.org) is a Jakarta EE compatible implementation sponsored by the Eclipse Foundation.
 
@@ -25,7 +25,7 @@ docker run -p 8080:8080 -p 4848:4848 @docker.glassfish.image@
 Open the following URLs in the browser:
 
 * **Welcome screen:** http://localhost:8080
-* **Administration Console:** https://localhost:4848 - log in using `admin`/`admin` (User name/Password) 
+* **Administration Console:** https://localhost:4848 - log in using `admin`/`admin` (User name/Password)
 
 ### Stop GlassFish
 
@@ -114,7 +114,7 @@ docker run @docker.glassfish.repository@ startserv --debug mydomain
 
 * `docker run` with the `--user` argument configures explicit user id for the container. It can be useful for K8S containers.
 
-* `docker run` with	`-d` starts the container as a daemon, so the shell doesn't print logs and finishes. Docker then returns the container id which you can use for further commands.
+* `docker run` with `-d` starts the container as a daemon, so the shell doesn't print logs and finishes. Docker then returns the container id which you can use for further commands.
 
 ```bash
 docker run -d @docker.glassfish.repository@
@@ -187,9 +187,9 @@ This is probably the simplest possible test with [GlassFish](https://glassfish.o
 
 If you want to run more complicated tests, the good path is to
 
-1.	Write a singleton managing the GlassFish Docker Container or the whole test environment.
-2.	Write your own Junit5 extension which would start the container before your test and ensure that everything stops after the test including failures.
-3.	You can also implement direct access to the virtual network, containers, so you can change the environment configuration in between tests and simulate network failures, etc.
+1.  Write a singleton managing the GlassFish Docker Container or the whole test environment.
+2.  Write your own Junit5 extension which would start the container before your test and ensure that everything stops after the test including failures.
+3.  You can also implement direct access to the virtual network, containers, so you can change the environment configuration in between tests and simulate network failures, etc.
 
 ```java
 @Testcontainers

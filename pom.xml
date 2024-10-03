@@ -7,7 +7,7 @@
     <version>0.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Glassfish Docker Image Distribution</name>
+    <name>Eclipse Glassfish Docker Image Distribution</name>
 
     <properties>
         <docker.baseImage>eclipse-temurin:17.0.12_7-jdk</docker.baseImage>
