@@ -57,6 +57,6 @@ public class StartServIT {
         } finally {
             connection.disconnect();
         }
-        assertThat(content.toString(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
+        assertThat(content, stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
     }
 }

@@ -40,7 +40,7 @@ public class AsadminIT {
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
-        .withCommand("asadmin start-domain").withExposedPorts(8080).withExposedPorts(8080)
+        .withCommand("asadmin start-domain").withExposedPorts(8080)
         .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
@@ -57,6 +57,6 @@ public class AsadminIT {
         } finally {
             connection.disconnect();
         }
-        assertThat(content.toString(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
+        assertThat(content, stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
     }
 }
