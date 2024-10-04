@@ -54,7 +54,7 @@ This will run GlassFish static shell JAR from the GlassFish installation, which 
 To display usage instructions, run:
 
 ```
-docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded --help
 ```
 
 To deploy an application, copy the application into the Docker image or mount the directory that contains it, and then pass the path to it as an argument. For example, if the application myapp.war is copied to the default `/opt/glassfish7` directory:
@@ -158,7 +158,7 @@ You can also just create a configuration file called `glassfish.properties` in t
 To display usage instructions, run:
 
 ```
-docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded
+docker run -it -p 8080:8080 @docker.glassfish.repository@ runembedded --help
 ```
 
 This Docker image also supports adding custom Java VM arguments, with the JVM_OPTS environments variable. FOr example, you can specify `-XX:MaxRAMPercentage=75` to set maximum heap size to 75% of RAM:
@@ -172,7 +172,7 @@ docker run -it -e JVM_OPTS=="-XX:MaxRAMPercentage=75" -p 8080:8080 @docker.glass
 
 To enable debugging, you can either add a custom debugging instruction for the JVM with the `JVM_OPTS` variable, or you can set one of the following environment variables to `true`:
 
-* `DEBUG` - enables remove debugger on port 9009, doesn't suspend the server
+* `DEBUG` - enables remote debugger on port 9009, doesn't suspend the server
 * `SUSPEND` - suspends the server right at the startup and continues when a debugger connects on port 9009
 
 Example:
