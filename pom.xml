@@ -129,8 +129,7 @@
                         <phase>process-classes</phase>
                         <configuration>
                             <mainClass>org.glassfish.docker.ShaGenerator</mainClass>
-                            <commandlineArgs>${project.build.directory}/glassfish.zip
-                                ${project.build.directory}/sha.properties</commandlineArgs>
+                            <commandlineArgs>${project.build.directory}/glassfish.zip ${project.build.directory}/sha.properties</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
