@@ -8,7 +8,7 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_ID: "ghcr.io/${{ github.repository_owner }}/glassfish"
-  IMAGE_VERSION: 7.0.19
+  IMAGE_VERSION: 7.0.20
 
 jobs:
   build:
