@@ -1,6 +1,32 @@
 #!/bin/bash
 set -e;
 
+change_passwords () {
+  local PWD_FILE=/tmp/passwordfile
+  if [ x${AS_ADMIN_PASSWORD} != x ]; then
+    echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" > $PWD_FILE
+    asadmin change-admin-password --passwordfile=${PWD_FILE}
+    rm -rf ${PWD_FILE}
+    echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
+  fi
+  if [ x${AS_ADMIN_MASTERPASSWORD} != x ]; then
+    echo -e "AS_ADMIN_MASTERPASSWORD=changeit\nAS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" > ${PWD_FILE}
+    asadmin change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true
+    rm -rf ${PWD_FILE}
+  fi
+}
+
+change_passwords
+
+if [ -f custom/init.sh ]; then
+  /bin/bash custom/init.sh
+fi
+
+if [ -f custom/init.asadmin ]; then
+  asadmin --interactive=false multimode -f custom/init.asadmin
+fi
+
+
 if [ "$1" != 'asadmin' -a "$1" != 'startserv' -a "$1" != 'runembedded' ]; then
     exec "$@"
 fi

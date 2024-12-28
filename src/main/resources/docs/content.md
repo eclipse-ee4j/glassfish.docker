@@ -63,7 +63,6 @@ To deploy an application, copy the application into the Docker image or mount th
 docker run -p 8080:8080 @docker.glassfish.repository@ runembedded myapp.war
 ```
 
-
 ## Run an application with GlassFish in Docker
 
 You can run an application located in your filesystem with GlassFIsh in a Docker container.
@@ -98,6 +97,116 @@ If you need suspend GlassFish startup until you connect the debugger, use the `-
 
 ```
 docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@ startserv --suspend
+```
+
+## Environment variables
+
+The following environment variables can be set to configure GlassFish Server:
+
+* `AS_ADMIN_MASTERPASSWORD` - to change the default master password
+* `AS_ADMIN_PASSWORD` - to change the default admin password
+
+The following environment variables are read-only and can be used in derived Docker images or scripts:
+
+* `AS_PASSWORD_FILE` - path to the password file with the admin password. It's applied by default to any asadmin command
+* `AS_ADMIN_USER` - name of the admin user. It's applied by default to any asadmin command
+* `PATH_GF_HOME` - directory of the GlassFish installation. Also the default working directory
+* `PATH_GF_SERVER_LOG` - path to the server log file
+
+## Additional configuration
+
+It's possible to specify custom commands to run in the Docker container before GlassFish server starts. The following methods are supported:
+
+* `${PATH_GF_HOME}/custom/init.sh` - Execute any `bash` script, which can execute admin commands via the `asadmin` command line tool
+* `${PATH_GF_HOME}/custom/init.asadmin` - Execute asadmin commands directly
+
+If both of the above scripts are present, they are executed in this order:
+
+1. `init.sh`
+2. `init.asadmin`
+
+However, always consider to executing any asadmin configuration commands during build, because configuring the server at container startup will prolong the startup time.
+
+### Execute asadmin commands before server startup
+
+Just create a file `${PATH_GF_HOME}/custom/init.asadmin` (`/opt/glassfish7/custom/init.asadmin`), the commands will be executed before GlassFish server starts.
+
+Within the `init.asadmin` file, you can specify any asadmin command. Most of the commands require that the server is running, so you'll need to start the server first, run the configuration commands, and then stop the server. 
+
+For example, to start GlassFish, increase the maximum amount of threads, and then stop it, the `init.asadmin` file can contain:
+
+```
+start-domain
+set configs.config.server-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=1000
+stop-domain
+```
+
+You can provide the file by mounting its directory to the `/opt/glassfish7/custom` directory in the container when running the container:
+
+```
+docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @docker.glassfish.repository@
+```
+
+### Execute a `bash` script before server startup
+
+Just create a Bash script `${PATH_GF_HOME}/custom/init.sh` (`/opt/glassfish7/custom/init.sh`), it will be executed before GlassFish server starts.
+
+Within the `init.sh` script, you can run any asadmin command, with `asadmin --interactive=false multimode COMMAND`. Most of the commands require that the server is running, so you'll need to start the server first, run the configuration commands, and then stop the server. If you need to run multiple commands, we recomment running asadmin commands in a single "multimode" asadmin execution to run them faster, with commands provided either on standard input or in a separate file via the `asadmin --interactive=false multimode -f` option.
+
+----
+
+**NOTE:** If you only need to execute `asadmin` commands before server startup, it's easier to use the init.asadmin script to execute them directly, without a `bash` script.
+
+----
+
+For example, to start GlassFish, increase the maximum amount of threads, and then stop it, the `init.sh` script can contain:
+
+```
+echo "start-domain
+set configs.config.server-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=1000
+stop-domain" | asadmin --interactive=false
+```
+
+You can provide the script by mounting its directory to the `/opt/glassfish7/custom` directory in the container when running the container:
+
+```
+docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @docker.glassfish.repository@
+```
+
+### Execute `asadmin` commands during Docker image build
+
+Applying the configuration can be a lengthy operation. If you can configure the server during build time, it's recommended running asadmin configuration commands in a custom Docker image. This moves the configuration step to the image build time instead of runtime.
+
+To do it, simply add `RUN instructions that run `asadmin` script with the usual arguments. For example, to move the example configuration from the `init.sh` script above to Dockerfile:
+
+File `Dockerfile`:
+
+```
+FROM @docker.glassfish.repository@
+
+RUN printf "start-domain \n \
+    set configs.config.server-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=1000 \n \
+    stop-domain" | asadmin --interactive=false
+```
+
+Or you can put the asadmin commands into a separate file and run it using `asadmin --interactive=false multimode -f`. For example:
+
+File `commands.asadmin`:
+
+```
+start-domain
+set configs.config.server-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=1000
+stop-domain
+```
+
+File `Dockerfile`:
+
+```
+FROM @docker.glassfish.repository@
+
+COPY commands.asadmin commands.asadmin
+
+RUN asadmin --interactive=false multimode -f commands.asadmin
 ```
 
 ## Examples of advanced usage
