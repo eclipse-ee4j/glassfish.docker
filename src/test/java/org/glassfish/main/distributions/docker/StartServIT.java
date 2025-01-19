@@ -16,47 +16,24 @@
 
 package org.glassfish.main.distributions.docker;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.stringContainsInOrder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.glassfish.main.distributions.docker.CommonIntegrationTests.assertDefaultServerRoot;
 
-/**
- *
- */
 @Testcontainers
 public class StartServIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
-        .withCommand("startserv").withExposedPorts(8080)
+        .withExposedPorts(8080)
         .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
     void getRoot() throws Exception {
-        URL url = URI.create("http://localhost:" + server.getMappedPort(8080) + "/").toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        String content;
-        try {
-            connection.setRequestMethod("GET");
-            assertEquals(200, connection.getResponseCode(), "Response code");
-            try (InputStream in = connection.getInputStream()) {
-                content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            }
-        } finally {
-            connection.disconnect();
-        }
-        assertThat(content, stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
+        assertDefaultServerRoot(server);
     }
 }
