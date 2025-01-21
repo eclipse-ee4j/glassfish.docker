@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Contributors to the Eclipse Foundation.
+ * Copyright (c) 2024,2025 Contributors to the Eclipse Foundation.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0, which is available at
@@ -13,17 +13,19 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  */
-
 package org.glassfish.main.distributions.docker;
 
+import java.net.http.HttpResponse;
 
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.glassfish.main.distributions.docker.CommonIntegrationTests.assertDefaultServerRoot;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.glassfish.main.distributions.docker.HttpUtilities.getServerDefaultRoot;
 
 /**
  *
@@ -34,11 +36,13 @@ public class AsadminIT {
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
-        .withCommand("asadmin start-domain").withExposedPorts(8080)
-        .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
+            .withCommand("asadmin start-domain").withExposedPorts(8080)
+            .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
-    void getRoot() throws Exception {
-        assertDefaultServerRoot(server);
+    void rootResourceGivesOkWithDefaultResponse() throws Exception {
+        final HttpResponse<String> defaultRootResponse = getServerDefaultRoot(server);
+        assertEquals(200, defaultRootResponse.statusCode(), "Response status code");
+        assertThat(defaultRootResponse.body(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
     }
 }

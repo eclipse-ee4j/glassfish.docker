@@ -3,17 +3,26 @@ set -e;
 
 change_passwords () {
   local PWD_FILE=/tmp/passwordfile
-  if [ x${AS_ADMIN_PASSWORD} != x ]; then
-    echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" > $PWD_FILE
-    asadmin change-admin-password --passwordfile=${PWD_FILE}
-    rm -rf ${PWD_FILE}
+  local COMMAND=
+  rm -rf $PWD_FILE
+
+  if [ x"${AS_ADMIN_PASSWORD}" != x ]; then
+    echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> $PWD_FILE
+    COMMAND="change-admin-password --passwordfile=${PWD_FILE}"
     echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
   fi
-  if [ x${AS_ADMIN_MASTERPASSWORD} != x ]; then
-    echo -e "AS_ADMIN_MASTERPASSWORD=changeit\nAS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" > ${PWD_FILE}
-    asadmin change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true
-    rm -rf ${PWD_FILE}
+
+  if [ x"${AS_ADMIN_MASTERPASSWORD}" != x ]; then
+    echo -e "AS_ADMIN_MASTERPASSWORD=changeit\nAS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" >> ${PWD_FILE}
+    COMMAND="${COMMAND}
+change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true"
   fi
+
+  if [ x"${COMMAND}" != x ]; then
+    printf "${COMMAND}" | asadmin --interactive=false
+  fi
+
+  rm -rf ${PWD_FILE}
 }
 
 change_passwords

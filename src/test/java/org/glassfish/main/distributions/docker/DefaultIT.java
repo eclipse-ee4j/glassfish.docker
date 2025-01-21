@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024,2025 Contributors to the Eclipse Foundation.
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0, which is available at
@@ -29,12 +29,12 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
-public class StartServIT {
+public class DefaultIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
-        .withCommand("startserv").withExposedPorts(8080)
+        .withExposedPorts(8080)
         .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
