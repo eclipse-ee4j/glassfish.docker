@@ -57,6 +57,7 @@ RUN true \
     && echo "Generating password file at ${AS_PASSWORD_FILE} ..." \
     && set +x \
     && echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}" \
+    && chown glassfish:glassfish "${AS_PASSWORD_FILE}" \
     && echo "AS_ADMIN_PASSWORD=" > "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
     && echo "AS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
     && echo "" >> "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}" \
