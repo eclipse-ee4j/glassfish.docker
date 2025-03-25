@@ -1,0 +1,3 @@
+Tags: 7.0.22, 7.0.22-jdk17, 7.0.22-jdk17-eclipse-temurin
+Architectures: amd64, arm64v8
+Directory: 7.0.22
