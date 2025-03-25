@@ -11,8 +11,8 @@
     <name>Eclipse Glassfish Docker Image Distribution</name>
 
     <properties>
-        <docker.baseImage>eclipse-temurin:17.0.13_11-jdk</docker.baseImage>
-        <glassfish.version>7.0.21</glassfish.version>
+        <docker.baseImage>eclipse-temurin:17.0.14_7-jdk</docker.baseImage>
+        <glassfish.version>7.0.22</glassfish.version>
         <docker.glassfish.repository>glassfish</docker.glassfish.repository>
         <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
         <docker.glassfish.image>${docker.glassfish.repository}:${docker.glassfish.tag}</docker.glassfish.image>
@@ -24,13 +24,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.11.4</version>
+            <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -42,13 +42,13 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.20.4</version>
+            <version>1.20.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.20.4</version>
+            <version>1.20.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
