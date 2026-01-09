@@ -34,13 +34,11 @@ ENV AS_USER=${AS_ADMIN_USER} \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-
 RUN true \
     && set -x \
-    && apt update \
-    && apt upgrade -y \
-    && apt install -y gpg unzip \
+    && apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y gpg unzip \
     && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip.asc" -o glassfish.zip.asc \
     && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip" -o glassfish.zip \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -76,9 +74,10 @@ RUN true \
     && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh \
     && mkdir ${PATH_GF_HOME}/autodeploy \
     && echo "Installation was successful."
+
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
