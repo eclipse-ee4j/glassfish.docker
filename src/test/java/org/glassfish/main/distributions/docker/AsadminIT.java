@@ -35,7 +35,7 @@ public class AsadminIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
-    private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
+    private final GenericContainer server = new GenericContainer<>(System.getProperty("server.docker.glassfish.image"))
             .withCommand("asadmin start-domain").withExposedPorts(8080)
             .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 

@@ -1,4 +1,4 @@
-name: Docker Publish to GitHub
+name: Publish GlassFish Server Docker Image to GitHub
 
 on:
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
       - name: Build and Deploy
         uses: docker/build-push-action@v6
         with:
-          context: ${{ env.IMAGE_VERSION }}
+          context: images/server/${{ env.IMAGE_VERSION }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ env.IMAGE_VERSION }},${{ env.IMAGE_ID }}:latest

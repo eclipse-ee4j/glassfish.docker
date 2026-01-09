@@ -11,13 +11,16 @@
     <name>Eclipse Glassfish Docker Image Distribution</name>
 
     <properties>
-        <docker.baseImage>eclipse-temurin:21-jdk</docker.baseImage>
         <glassfish.version>7.1.0</glassfish.version>
-        <docker.glassfish.repository>glassfish</docker.glassfish.repository>
-        <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
-        <docker.glassfish.image>${docker.glassfish.repository}:${docker.glassfish.tag}</docker.glassfish.image>
-        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
+        <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
+        <server.docker.baseImage>eclipse-temurin:21-jdk</server.docker.baseImage>
+        <server.docker.glassfish.repository>glassfish</server.docker.glassfish.repository>
+        <server.docker.glassfish.image>${server.docker.glassfish.repository}:${docker.glassfish.tag}</server.docker.glassfish.image>
+        <server.relative.dir>images/server</server.relative.dir>
+        <server.images.dir>${basedir}/${server.relative.dir}</server.images.dir>
+        <server.resources.dir>src/main/resources/${server.relative.dir}</server.resources.dir>
     </properties>
 
     <dependencies>
@@ -54,24 +57,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>Dockerfile</include>
-                    <include>dockerlibfile-fragment.txt</include>
-                    <include>docs/**</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>docker-entrypoint.sh</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -177,11 +162,29 @@
                     <execution>
                         <id>filter-dockerfile</id>
                         <goals>
-                            <goal>resources</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${basedir}/${docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${server.images.dir}/${docker.glassfish.tag}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${server.resources.dir}</directory>
+                                    <includes>
+                                        <include>Dockerfile</include>
+                                        <include>dockerlibfile-fragment.txt</include>
+                                        <include>docs/**</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${server.resources.dir}</directory>
+                                    <includes>
+                                        <include>docker-entrypoint.sh</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -203,7 +206,7 @@
                     <verbose>true</verbose>
                     <images>
                         <image>
-                            <name>${docker.glassfish.repository}</name>
+                            <name>${server.docker.glassfish.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
@@ -215,7 +218,7 @@
                                 </tags>
                                 <cleanup>none</cleanup>
                                 <noCache>false</noCache>
-                                <dockerFile>${basedir}/${docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <dockerFile>${server.images.dir}/${docker.glassfish.tag}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
@@ -267,7 +270,7 @@
                     <version>3.5.1</version>
                     <configuration>
                         <systemPropertyVariables>
-                            <docker.glassfish.image>${docker.glassfish.image}</docker.glassfish.image>
+                            <server.docker.glassfish.image>${server.docker.glassfish.image}</server.docker.glassfish.image>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>

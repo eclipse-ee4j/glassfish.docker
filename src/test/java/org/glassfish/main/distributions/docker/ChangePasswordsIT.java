@@ -37,7 +37,7 @@ public class ChangePasswordsIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
-    private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
+    private final GenericContainer server = new GenericContainer<>(System.getProperty("server.docker.glassfish.image"))
             .withExposedPorts(8080, 4848)
             .withEnv("AS_ADMIN_MASTERPASSWORD", "mymasterpassword")
             .withEnv("AS_ADMIN_PASSWORD", "myadminpassword")
