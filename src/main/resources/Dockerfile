@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.authors="glassfish-dev@eclipse.org"
 LABEL org.opencontainers.image.vendor="Eclipse Foundation"
 LABEL org.opencontainers.image.licenses="EPL-2.0"
 
-EXPOSE 4848 9009 8080 8181 7676 8686 3700 3820 3920 6666
+EXPOSE 4848 9009 8080 8181 8686 3700 3820 3920 6666
 
 # You should use own credentials and own files! These are just defaults.
 ARG AS_ADMIN_PASSWORD=admin \
