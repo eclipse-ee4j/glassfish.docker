@@ -319,6 +319,25 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>build-test-app</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <configuration>
+                            <warSourceDirectory>src/test/webapp</warSourceDirectory>
+                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                            <warName>application</warName>
+                            <classifier>test</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -346,6 +365,7 @@
                     <configuration>
                         <systemPropertyVariables>
                             <server.docker.glassfish.image>${server.docker.glassfish.image}</server.docker.glassfish.image>
+                            <embedded.docker.glassfish.image>${embedded.docker.glassfish.image}</embedded.docker.glassfish.image>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>

@@ -25,7 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.glassfish.main.distributions.docker.server.HttpUtilities.getServerDefaultRoot;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
 
 /**
  *

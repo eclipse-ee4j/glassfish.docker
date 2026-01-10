@@ -56,6 +56,14 @@ Follow these steps:
 docker run -p 8080:8080 -v /deployments:/deploy @docker.glassfish.embedded.repository@
 ```
 
+Alternatively, you can mount a specific WAR file directly:
+
+```
+docker run -p 8080:8080 -v /deployments/application.war:/deploy/application.war @docker.glassfish.embedded.repository@
+```
+
+**Note**: When deploying a single application, GlassFish Embedded automatically deploys it at the root context (`/`) rather than using the WAR filename as the context path.
+
 Then you can open the application in the browser with:
 
 * http://localhost:8080
@@ -98,11 +106,19 @@ docker run -p 8080:8080 -e 'JAVA_TOOL_OPTIONS=-Xmx512m -Dmy.property=value' @doc
 
 ### Custom application deployment
 
-Applications placed in the `/deploy` directory will be automatically deployed at startup:
+Applications placed in the `/deploy` directory will be automatically deployed at startup. You can either:
 
+- Mount a directory containing WAR files:
 ```
 docker run -p 8080:8080 -v /path/to/apps:/deploy @docker.glassfish.embedded.repository@
 ```
+
+- Mount a specific WAR file directly:
+```
+docker run -p 8080:8080 -v /path/to/myapp.war:/deploy/myapp.war @docker.glassfish.embedded.repository@
+```
+
+**Note**: When deploying a single application, GlassFish Embedded automatically deploys it at the root context (`/`) rather than using the WAR filename as the context path.
 
 Paths to applications in different locations can be passed on command line, e.g.:
 

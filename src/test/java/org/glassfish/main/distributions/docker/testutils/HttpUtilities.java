@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  */
-package org.glassfish.main.distributions.docker.server;
+package org.glassfish.main.distributions.docker.testutils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,6 +29,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.glassfish.main.distributions.docker.server.UserPassword;
 import org.testcontainers.containers.GenericContainer;
 
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
@@ -42,7 +43,7 @@ public final class HttpUtilities {
     private HttpUtilities() {
     }
 
-    static HttpResponse<String> getServerDefaultRoot(GenericContainer server) throws Exception {
+    public static HttpResponse<String> getServerDefaultRoot(GenericContainer server) throws Exception {
         URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + "/");
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri).build();
@@ -50,7 +51,7 @@ public final class HttpUtilities {
         }
     }
 
-    static HttpResponse<String> getEmbeddedDefaultRoot(GenericContainer server) throws Exception {
+    public static HttpResponse<String> getEmbeddedDefaultRoot(GenericContainer server) throws Exception {
         URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + "/");
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri).build();
@@ -58,7 +59,15 @@ public final class HttpUtilities {
         }
     }
 
-    static HttpResponse<String> getAdminResource(GenericContainer server, String resourcePath, UserPassword userPass) throws Exception {
+    public static HttpResponse<String> getEmbeddedApplication(GenericContainer server, String appPath) throws Exception {
+        URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + appPath);
+        try (HttpClient client = newInsecureHttpClient()) {
+            final HttpRequest request = HttpRequest.newBuilder(uri).build();
+            return client.send(request, ofString(StandardCharsets.UTF_8));
+        }
+    }
+
+    public static HttpResponse<String> getAdminResource(GenericContainer server, String resourcePath, UserPassword userPass) throws Exception {
         URI uri = URI.create("https://localhost:" + server.getMappedPort(4848) + resourcePath);
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri)
