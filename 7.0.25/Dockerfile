@@ -1,18 +1,18 @@
-FROM @docker.baseImage@
+FROM eclipse-temurin:17.0.17_10-jdk
 
-LABEL org.opencontainers.image.base.name="@docker.baseImage@"
+LABEL org.opencontainers.image.base.name="eclipse-temurin:17.0.17_10-jdk"
 LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
 LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
 
 LABEL org.opencontainers.image.title="Eclipse GlassFish"
 LABEL org.opencontainers.image.description="The Official Eclipse GlassFish Docker Image"
-LABEL org.opencontainers.image.version="@glassfish.version@"
+LABEL org.opencontainers.image.version="7.0.25"
 
 LABEL org.opencontainers.image.authors="glassfish-dev@eclipse.org"
 LABEL org.opencontainers.image.vendor="Eclipse Foundation"
 LABEL org.opencontainers.image.licenses="EPL-2.0"
 
-EXPOSE 4848 9009 8080 8181 8686 3700 3820 3920 6666
+EXPOSE 4848 9009 8080 8181 7676 8686 3700 3820 3920 6666
 
 # You should use own credentials and own files! These are just defaults.
 ARG AS_ADMIN_PASSWORD=admin \
@@ -28,17 +28,19 @@ ENV AS_USER=${AS_ADMIN_USER} \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
     AS_STOP_TIMEOUT=9500 \
-    GLASSFISH_DOWNLOAD_SHA512=@glassfish.zip.sha512@ \
-    GLASSFISH_VERSION=@glassfish.version@ \
+    GLASSFISH_DOWNLOAD_SHA512=c8388161f1204b0c0b32e595b5f3cd36303a9e22b213c1ae6ac50f0b8ae0a2eb7bec7ed9fc68071605c0df3f50aa5960d1ccd1ea9ee72b204afee90f864e7b75 \
+    GLASSFISH_VERSION=7.0.25 \
     PATH_GF_BIN=${PATH_GF_HOME}/bin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"
 
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
 RUN true \
     && set -x \
-    && apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y gpg unzip \
+    && apt update \
+    && apt upgrade -y \
+    && apt install -y gpg unzip \
     && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip.asc" -o glassfish.zip.asc \
     && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-${GLASSFISH_VERSION}.zip" -o glassfish.zip \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -74,10 +76,9 @@ RUN true \
     && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh \
     && mkdir ${PATH_GF_HOME}/autodeploy \
     && echo "Installation was successful."
-
-COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 USER glassfish
 WORKDIR ${PATH_GF_HOME}
