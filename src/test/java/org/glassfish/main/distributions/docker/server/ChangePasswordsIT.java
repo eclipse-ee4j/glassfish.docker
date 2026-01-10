@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024,2025 Contributors to the Eclipse Foundation.
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0, which is available at
@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  */
-package org.glassfish.main.distributions.docker;
+package org.glassfish.main.distributions.docker.server;
 
 import java.net.http.HttpResponse;
 
@@ -22,21 +22,25 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.glassfish.main.distributions.docker.server.HttpUtilities.getServerDefaultRoot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.glassfish.main.distributions.docker.HttpUtilities.getServerDefaultRoot;
+import static org.glassfish.main.distributions.docker.server.HttpUtilities.getAdminResource;
 
 /**
  *
+ * @author Ondro Mihalyi
  */
 @Testcontainers
-public class AsadminIT {
+public class ChangePasswordsIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("server.docker.glassfish.image"))
-            .withCommand("asadmin start-domain").withExposedPorts(8080)
+            .withExposedPorts(8080, 4848)
+            .withEnv("AS_ADMIN_MASTERPASSWORD", "mymasterpassword")
+            .withEnv("AS_ADMIN_PASSWORD", "myadminpassword")
             .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
@@ -45,4 +49,12 @@ public class AsadminIT {
         assertEquals(200, defaultRootResponse.statusCode(), "Response status code");
         assertThat(defaultRootResponse.body(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
     }
+
+    @Test
+    void customAdminPassword() throws Exception {
+        final HttpResponse<String> adminResourceResponse = getAdminResource(server, "/management/domain.json",
+                new UserPassword("admin", "myadminpassword"));
+        assertEquals(200, adminResourceResponse.statusCode(), "Response status code");
+    }
+
 }
