@@ -8,6 +8,7 @@ change_passwords () {
 
   if [ x"${AS_ADMIN_PASSWORD}" != x ]; then
     echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> $PWD_FILE
+cat ${PWD_FILE}
     COMMAND="change-admin-password --passwordfile=${PWD_FILE}"
     echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
   fi
@@ -19,7 +20,9 @@ change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true"
   fi
 
   if [ x"${COMMAND}" != x ]; then
-    printf "${COMMAND}" | asadmin --interactive=false
+    printf "${COMMAND}" > /tmp/commands
+    asadmin multimode --interactive=false --file /tmp/commands
+    rm -rf /tmp/commands
   fi
 
   rm -rf ${PWD_FILE}
