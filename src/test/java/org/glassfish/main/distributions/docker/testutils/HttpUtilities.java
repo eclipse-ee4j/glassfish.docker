@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.Base64;
 
 import javax.net.ssl.SSLContext;
@@ -33,6 +34,7 @@ import org.glassfish.main.distributions.docker.server.UserPassword;
 import org.testcontainers.containers.GenericContainer;
 
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static java.time.Duration.ofSeconds;
 
 /**
  *
@@ -59,12 +61,27 @@ public final class HttpUtilities {
         }
     }
 
-    public static HttpResponse<String> getEmbeddedApplication(GenericContainer server, String appPath) throws Exception {
+    public static HttpResponse<String> getApplication(GenericContainer server, String appPath) throws Exception {
         URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + appPath);
-        try (HttpClient client = newInsecureHttpClient()) {
-            final HttpRequest request = HttpRequest.newBuilder(uri).build();
-            return client.send(request, ofString(StandardCharsets.UTF_8));
+
+        // Wait up to 30 seconds for the application to become available
+        long startTime = System.currentTimeMillis();
+        HttpResponse<String> response = null;
+
+        while ((System.currentTimeMillis() - startTime) < Duration.ofSeconds(30).toMillis()) {
+            try (HttpClient client = newInsecureHttpClient()) {
+                final HttpRequest request = HttpRequest.newBuilder(uri).build();
+                response = client.send(request, ofString(StandardCharsets.UTF_8));
+
+                if (response.statusCode() == 200) {
+                    return response;
+                }
+
+                Thread.sleep(ofSeconds(1)); // Wait 1 second before retrying
+            }
         }
+
+        return response; // Return the last response (likely 404)
     }
 
     public static HttpResponse<String> getAdminResource(GenericContainer server, String resourcePath, UserPassword userPass) throws Exception {

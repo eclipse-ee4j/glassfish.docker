@@ -55,6 +55,14 @@ Follow these steps:
 docker run -p 8080:8080 -p 4848:4848 -v /deployments:/deploy @docker.glassfish.repository@
 ```
 
+Alternatively, you can mount a specific WAR file directly:
+
+```
+docker run -p 8080:8080 -p 4848:4848 -v /deployment/application.war:/deploy/application.war @docker.glassfish.repository@
+```
+
+**Note**: GlassFish Server deploys applications using the WAR filename as the context path (e.g., `application.war` becomes accessible at `/application/`).
+
 Then you can open the application in the browser with:
 
 * http://localhost:9080/application

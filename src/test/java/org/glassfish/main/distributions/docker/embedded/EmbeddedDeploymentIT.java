@@ -26,7 +26,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getEmbeddedApplication;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getApplication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,29 +43,8 @@ public class EmbeddedDeploymentIT {
 
     @Test
     void deployedApplicationIsAccessible() throws Exception {
-        // Wait for the GLASSFISH STARTED message in logs
-        long startTime = System.currentTimeMillis();
-        boolean glassfishStarted = false;
-        while (!glassfishStarted && (System.currentTimeMillis() - startTime) < 120000) { // 2 minutes
-            String logs = server.getLogs();
-            if (logs.contains("GLASSFISH STARTED")) {
-                glassfishStarted = true;
-            } else {
-                Thread.sleep(1000); // Wait 1 second before checking again
-            }
-        }
-
-        if (!glassfishStarted) {
-            System.err.println("Full logs: " + server.getLogs());
-            throw new RuntimeException("GlassFish did not start within 2 minutes");
-        }
-
-        System.err.println("GlassFish started successfully, checking application deployment...");
-
         // Verify the application is deployed by checking if it's accessible
-        final HttpResponse<String> appResponse = getEmbeddedApplication(server, "/index.html");
-        System.err.println("Response status: " + appResponse.statusCode());
-        System.err.println("Response body: " + appResponse.body());
+        final HttpResponse<String> appResponse = getApplication(server, "/index.html");
         assertEquals(200, appResponse.statusCode(), "Application response status code");
         assertTrue(appResponse.body().contains("Hello from test app"), "Application should return Hello message");
     }

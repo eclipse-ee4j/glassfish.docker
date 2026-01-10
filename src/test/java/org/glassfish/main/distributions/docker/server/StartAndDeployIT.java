@@ -19,22 +19,27 @@ package org.glassfish.main.distributions.docker.server;
 import java.net.http.HttpResponse;
 
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getApplication;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
-public class StartServIT {
+public class StartAndDeployIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("server.docker.glassfish.image"))
-        .withCommand("startserv").withExposedPorts(8080)
+        .withCommand("startserv")
+        .withExposedPorts(8080)
+        .withFileSystemBind("target/test-classes/application-test.war", "/deploy/application-test.war", BindMode.READ_ONLY)
         .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
 
     @Test
@@ -42,5 +47,12 @@ public class StartServIT {
         final HttpResponse<String> defaultRootResponse = getServerDefaultRoot(server);
         assertEquals(200, defaultRootResponse.statusCode(), "Response status code");
         assertThat(defaultRootResponse.body(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
+    }
+
+    @Test
+    void deployedApplicationIsAccessible() throws Exception {
+        final HttpResponse<String> appResponse = getApplication(server, "/application-test/index.html");
+        assertEquals(200, appResponse.statusCode(), "Application response status code");
+        assertTrue(appResponse.body().contains("Hello from test app"), "Application should return Hello message");
     }
 }
