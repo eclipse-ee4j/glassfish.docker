@@ -41,6 +41,7 @@ RUN true \
     && env | sort \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
     && mkdir ${PATH_GF_HOME}/autodeploy \
+    && ln -s ${PATH_GF_HOME}/autodeploy /deploy \
     && echo "Installation was successful."
 
 USER glassfish

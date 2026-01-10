@@ -205,7 +205,7 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${server.images.dir}/${docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${server.images.dir}/${server.docker.glassfish.tag}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${server.resources.dir}</directory>

@@ -1,6 +1,6 @@
 # Eclipse GlassFish Docker images
 
-[Eclipse GlassFish](https://glassfish.org) is a Jakarta EE compatible implementation sponsored by the Eclipse Foundation.
+[Eclipse GlassFish](https://glassfish.org) is a Jakarta EE compatible implementation.
 
 %%LOGO%%
 
@@ -49,10 +49,10 @@ Follow these steps:
 
 1. Create an empty directory on your filesystem, e.g. `/deployment`
 2. Copy the application package to this directory - so that it's for example on the path `/deployment/application.war`
-3. Run the following command to start GlassFish in Docker with your application, where `/deployments` is path to the directory created in step 1:
+3. Run the following command to start GlassFish in Docker with your application, where `/deployments` is path to the directory created in step 1, and /deploy is the directory in the container where GlassFish expects applications:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 -v /deployments:/opt/glassfish7/glassfish/domains/domain1/autodeploy @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 -v /deployments:/deploy @docker.glassfish.repository@
 ```
 
 Then you can open the application in the browser with:

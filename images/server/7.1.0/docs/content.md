@@ -1,6 +1,6 @@
 # Eclipse GlassFish Docker images
 
-[Eclipse GlassFish](https://glassfish.org) is a Jakarta EE compatible implementation sponsored by the Eclipse Foundation.
+[Eclipse GlassFish](https://glassfish.org) is a Jakarta EE compatible implementation.
 
 %%LOGO%%
 

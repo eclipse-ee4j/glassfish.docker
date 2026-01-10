@@ -74,7 +74,7 @@ RUN true \
     && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
-    && mkdir ${PATH_GF_HOME}/autodeploy \
+    && ln -s "${PATH_GF_HOME}/glassfish/domains/domain1/autodeploy" /deploy \
     && echo "Installation was successful."
 
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
