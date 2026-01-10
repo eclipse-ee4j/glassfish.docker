@@ -11,13 +11,26 @@
     <name>Eclipse Glassfish Docker Image Distribution</name>
 
     <properties>
-        <docker.baseImage>eclipse-temurin:17.0.17_10-jdk</docker.baseImage>
-        <glassfish.version>7.0.25</glassfish.version>
-        <docker.glassfish.repository>glassfish</docker.glassfish.repository>
-        <docker.glassfish.tag>${glassfish.version}</docker.glassfish.tag>
-        <docker.glassfish.image>${docker.glassfish.repository}:${docker.glassfish.tag}</docker.glassfish.image>
-        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
+        <glassfish.version>7.1.0</glassfish.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <server.docker.platforms>linux/amd64,linux/arm64</server.docker.platforms>
+        <server.docker.glassfish.tag>${glassfish.version}</server.docker.glassfish.tag>
+        <server.docker.baseImage>eclipse-temurin:21-jdk</server.docker.baseImage>
+        <server.docker.glassfish.repository>glassfish</server.docker.glassfish.repository>
+        <server.docker.glassfish.image>${server.docker.glassfish.repository}:${server.docker.glassfish.tag}</server.docker.glassfish.image>
+        <server.relative.dir>images/server</server.relative.dir>
+        <server.images.dir>${basedir}/${server.relative.dir}</server.images.dir>
+        <server.resources.dir>src/main/resources/${server.relative.dir}</server.resources.dir>
+
+        <embedded.docker.platforms>${server.docker.platforms}</embedded.docker.platforms>
+        <embedded.docker.glassfish.tag>${server.docker.glassfish.tag}</embedded.docker.glassfish.tag>
+        <embedded.docker.baseImage>${server.docker.baseImage}</embedded.docker.baseImage>
+        <embedded.docker.glassfish.repository>embedded-glassfish</embedded.docker.glassfish.repository>
+        <embedded.docker.glassfish.image>${embedded.docker.glassfish.repository}:${embedded.docker.glassfish.tag}</embedded.docker.glassfish.image>
+        <embedded.relative.dir>images/embedded</embedded.relative.dir>
+        <embedded.images.dir>${basedir}/${embedded.relative.dir}</embedded.images.dir>
+        <embedded.resources.dir>src/main/resources/${embedded.relative.dir}</embedded.resources.dir>
     </properties>
 
     <dependencies>
@@ -54,24 +67,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>Dockerfile</include>
-                    <include>dockerlibfile-fragment.txt</include>
-                    <include>docs/**</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>docker-entrypoint.sh</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -105,6 +100,12 @@
                             <version>${glassfish.version}</version>
                             <type>zip</type>
                         </artifact>
+                        <artifact>
+                            <groupId>org.glassfish.main.extras</groupId>
+                            <artifactId>glassfish-embedded-all</artifactId>
+                            <version>${glassfish.version}</version>
+                            <type>jar</type>
+                        </artifact>
                     </artifactItems>
                 </configuration>
                 <executions>
@@ -123,14 +124,25 @@
                 <version>3.5.0</version>
                 <executions>
                     <execution>
-                        <id>computeSha512</id>
+                        <id>server.computeSha512</id>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <phase>process-classes</phase>
                         <configuration>
                             <mainClass>org.glassfish.docker.ShaGenerator</mainClass>
-                            <commandlineArgs>${project.build.directory}/glassfish.zip ${project.build.directory}/sha.properties</commandlineArgs>
+                            <commandlineArgs>${project.build.directory}/glassfish.zip ${project.build.directory}/server.sha.properties server.sha512</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>embedded.computeSha512</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <mainClass>org.glassfish.docker.ShaGenerator</mainClass>
+                            <commandlineArgs>${project.build.directory}/glassfish-embedded-all.jar ${project.build.directory}/embedded.sha.properties embedded.sha512</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -150,18 +162,30 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>1.2.1</version>
-                <configuration>
-                    <files>
-                        <file>${project.build.directory}/sha.properties</file>
-                    </files>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>load-sha512</id>
+                        <id>server.load-sha512</id>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
                         <phase>prepare-package</phase>
+                        <configuration>
+                            <files>
+                                <file>${project.build.directory}/server.sha.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>embedded.load-sha512</id>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <files>
+                                <file>${project.build.directory}/embedded.sha.properties</file>
+                            </files>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -175,13 +199,50 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>filter-dockerfile</id>
+                        <id>filter-server-dockerfile</id>
                         <goals>
-                            <goal>resources</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${basedir}/${docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${server.images.dir}/${server.docker.glassfish.tag}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${server.resources.dir}</directory>
+                                    <includes>
+                                        <include>Dockerfile</include>
+                                        <include>dockerlibfile-fragment.txt</include>
+                                        <include>docs/**</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${server.resources.dir}</directory>
+                                    <includes>
+                                        <include>docker-entrypoint.sh</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>filter-embedded-dockerfile</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <outputDirectory>${embedded.images.dir}/${embedded.docker.glassfish.tag}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${embedded.resources.dir}</directory>
+                                    <includes>
+                                        <include>Dockerfile</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -203,19 +264,36 @@
                     <verbose>true</verbose>
                     <images>
                         <image>
-                            <name>${docker.glassfish.repository}</name>
+                            <name>${server.docker.glassfish.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
-                                        <platform>${docker.platforms}</platform>
+                                        <platform>${server.docker.platforms}</platform>
                                     </platforms>
                                 </buildx>
                                 <tags>
-                                    <tag>${docker.glassfish.tag}</tag>
+                                    <tag>${server.docker.glassfish.tag}</tag>
                                 </tags>
                                 <cleanup>none</cleanup>
                                 <noCache>false</noCache>
-                                <dockerFile>${basedir}/${docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <dockerFile>${server.images.dir}/${server.docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <filter>@</filter>
+                            </build>
+                        </image>
+                        <image>
+                            <name>${embedded.docker.glassfish.repository}</name>
+                            <build>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${embedded.docker.platforms}</platform>
+                                    </platforms>
+                                </buildx>
+                                <tags>
+                                    <tag>${embedded.docker.glassfish.tag}</tag>
+                                </tags>
+                                <cleanup>none</cleanup>
+                                <noCache>false</noCache>
+                                <dockerFile>${embedded.images.dir}/${embedded.docker.glassfish.tag}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
@@ -238,6 +316,25 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>build-test-app</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <configuration>
+                            <warSourceDirectory>src/test/webapp</warSourceDirectory>
+                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                            <warName>application</warName>
+                            <classifier>test</classifier>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -267,7 +364,8 @@
                     <version>3.5.1</version>
                     <configuration>
                         <systemPropertyVariables>
-                            <docker.glassfish.image>${docker.glassfish.image}</docker.glassfish.image>
+                            <server.docker.glassfish.image>${server.docker.glassfish.image}</server.docker.glassfish.image>
+                            <embedded.docker.glassfish.image>${embedded.docker.glassfish.image}</embedded.docker.glassfish.image>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>

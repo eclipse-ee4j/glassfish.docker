@@ -1,4 +1,4 @@
-name: Docker Publish to GitHub
+name: Publish Embedded GlassFish Docker Image to GitHub
 
 on:
   workflow_dispatch:
@@ -7,8 +7,8 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_ID: "ghcr.io/${{ github.repository_owner }}/glassfish"
-  IMAGE_VERSION: 7.0.25
+  IMAGE_ID: "ghcr.io/${{ github.repository_owner }}/embedded-glassfish"
+  IMAGE_VERSION: 7.1.0
 
 jobs:
   build:
@@ -49,12 +49,12 @@ jobs:
           mvn -v
           uname -a
           docker buildx ls
-          docker buildx imagetools inspect ${{ env.IMAGE_ID }}:latest
+          docker buildx imagetools inspect ${{ env.IMAGE_ID }}:latest || echo "No image ${{ env.IMAGE_ID }}:latest exists"
 
       - name: Build and Deploy
         uses: docker/build-push-action@v6
         with:
-          context: ${{ env.IMAGE_VERSION }}
+          context: images/embedded/${{ env.IMAGE_VERSION }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ env.IMAGE_VERSION }},${{ env.IMAGE_ID }}:latest

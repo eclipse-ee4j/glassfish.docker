@@ -38,6 +38,7 @@ public class ShaGenerator {
         }
         final Path input = Paths.get(args[0]);
         final File properties = new File(args[1]);
+        final String shaPropertyName = args[2];
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
         byte[] bytes = Files.readAllBytes(input);
         BigInteger no = new BigInteger(1, messageDigest.digest(bytes));
@@ -46,7 +47,7 @@ public class ShaGenerator {
             hashtext = "0" + hashtext;
         }
         Properties props = new Properties();
-        props.setProperty("glassfish.zip.sha512", " ".repeat(128 - hashtext.length()) + hashtext);
+        props.setProperty(shaPropertyName, " ".repeat(128 - hashtext.length()) + hashtext);
         try (FileOutputStream output = new FileOutputStream(properties)) {
             props.store(output, null);
         }
