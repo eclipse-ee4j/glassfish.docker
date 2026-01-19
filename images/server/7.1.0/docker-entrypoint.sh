@@ -1,31 +1,28 @@
 #!/bin/bash
-set -e;
+set -e
 
 change_passwords () {
   local PWD_FILE=/tmp/passwordfile
   local COMMAND=
   rm -rf $PWD_FILE
 
-  if [ x"${AS_ADMIN_PASSWORD}" != x ]; then
+  if [ "${AS_ADMIN_PASSWORD}" != "" ] && [ "${AS_ADMIN_PASSWORD}" != "admin" ]; then
     echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> $PWD_FILE
-cat ${PWD_FILE}
-    COMMAND="change-admin-password --passwordfile=${PWD_FILE}"
+    COMMAND="change-admin-password"
     echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
   fi
 
-  if [ x"${AS_ADMIN_MASTERPASSWORD}" != x ]; then
+  if [ "${AS_ADMIN_MASTERPASSWORD}" != "" ] && [ "${AS_ADMIN_MASTERPASSWORD}" != "changeit" ]; then
     echo -e "AS_ADMIN_MASTERPASSWORD=changeit\nAS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" >> ${PWD_FILE}
-    COMMAND="${COMMAND}
-change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true"
+    COMMAND="${COMMAND}\nchange-master-password --savemasterpassword=true"
   fi
 
-  if [ x"${COMMAND}" != x ]; then
-    printf "${COMMAND}" > /tmp/commands
-    asadmin multimode --interactive=false --file /tmp/commands
-    rm -rf /tmp/commands
+  if [ "${COMMAND}" != "" ]; then
+    echo -e "${COMMAND}" | asadmin --interactive=false --passwordfile=${PWD_FILE} 
   fi
 
   rm -rf ${PWD_FILE}
+  history -c
 }
 
 change_passwords
@@ -50,6 +47,10 @@ then
     rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus || true
 fi
 
+if [ "${AS_TRACE}" == true ]; then
+    env|sort
+fi
+
 if [ "$1" == 'startserv' ]; then
   exec "$@"
 fi
@@ -63,4 +64,4 @@ on_exit () {
 }
 trap on_exit EXIT
 
-env|sort && "$@" & wait
+"$@" & wait
