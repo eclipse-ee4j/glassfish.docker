@@ -12,25 +12,25 @@
 
     <properties>
         <glassfish.version>7.1.0</glassfish.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <server.docker.platforms>linux/amd64,linux/arm64</server.docker.platforms>
-        <server.docker.glassfish.tag>${glassfish.version}</server.docker.glassfish.tag>
-        <server.docker.baseImage>eclipse-temurin:21-jdk</server.docker.baseImage>
-        <server.docker.glassfish.repository>glassfish</server.docker.glassfish.repository>
-        <server.docker.glassfish.image>${server.docker.glassfish.repository}:${server.docker.glassfish.tag}</server.docker.glassfish.image>
-        <server.relative.dir>images/server</server.relative.dir>
-        <server.images.dir>${basedir}/${server.relative.dir}</server.images.dir>
-        <server.resources.dir>src/main/resources/${server.relative.dir}</server.resources.dir>
+        <gf.docker.baseImage>eclipse-temurin:21-jdk</gf.docker.baseImage>
+        <gf.docker.platforms>linux/amd64,linux/arm64</gf.docker.platforms>
 
-        <embedded.docker.platforms>${server.docker.platforms}</embedded.docker.platforms>
-        <embedded.docker.glassfish.tag>${server.docker.glassfish.tag}</embedded.docker.glassfish.tag>
-        <embedded.docker.baseImage>${server.docker.baseImage}</embedded.docker.baseImage>
-        <embedded.docker.glassfish.repository>embedded-glassfish</embedded.docker.glassfish.repository>
-        <embedded.docker.glassfish.image>${embedded.docker.glassfish.repository}:${embedded.docker.glassfish.tag}</embedded.docker.glassfish.image>
-        <embedded.relative.dir>images/embedded</embedded.relative.dir>
-        <embedded.images.dir>${basedir}/${embedded.relative.dir}</embedded.images.dir>
-        <embedded.resources.dir>src/main/resources/${embedded.relative.dir}</embedded.resources.dir>
+        <gf.docker.embedded.dir.relative>images/embedded</gf.docker.embedded.dir.relative>
+        <gf.docker.embedded.dir.target>${basedir}/${gf.docker.embedded.dir.relative}/${gf.docker.embedded.tag}</gf.docker.embedded.dir.target>
+        <gf.docker.embedded.dir.source>src/main/resources/${gf.docker.embedded.dir.relative}</gf.docker.embedded.dir.source>
+        <gf.docker.embedded.repository>embedded-glassfish</gf.docker.embedded.repository>
+        <gf.docker.embedded.tag>${gf.docker.server.tag}</gf.docker.embedded.tag>
+        <gf.docker.embedded.image>${gf.docker.embedded.repository}:${gf.docker.embedded.tag}</gf.docker.embedded.image>
+
+        <gf.docker.server.dir.relative>images/server</gf.docker.server.dir.relative>
+        <gf.docker.server.dir.source>src/main/resources/${gf.docker.server.dir.relative}</gf.docker.server.dir.source>
+        <gf.docker.server.dir.target>${basedir}/${gf.docker.server.dir.relative}/${gf.docker.server.tag}</gf.docker.server.dir.target>
+        <gf.docker.server.repository>glassfish</gf.docker.server.repository>
+        <gf.docker.server.tag>${glassfish.version}</gf.docker.server.tag>
+        <gf.docker.server.image>${gf.docker.server.repository}:${gf.docker.server.tag}</gf.docker.server.image>
     </properties>
 
     <dependencies>
@@ -195,10 +195,10 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${server.images.dir}/${server.docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${gf.docker.server.dir.target}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${server.resources.dir}</directory>
+                                    <directory>${gf.docker.server.dir.source}</directory>
                                     <includes>
                                         <include>Dockerfile</include>
                                         <include>dockerlibfile-fragment.txt</include>
@@ -207,7 +207,7 @@
                                     <filtering>true</filtering>
                                 </resource>
                                 <resource>
-                                    <directory>${server.resources.dir}</directory>
+                                    <directory>${gf.docker.server.dir.source}</directory>
                                     <includes>
                                         <include>docker-entrypoint.sh</include>
                                     </includes>
@@ -223,10 +223,10 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${embedded.images.dir}/${embedded.docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${gf.docker.embedded.dir.target}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${embedded.resources.dir}</directory>
+                                    <directory>${gf.docker.embedded.dir.source}</directory>
                                     <includes>
                                         <include>Dockerfile</include>
                                     </includes>
@@ -253,36 +253,36 @@
                     <verbose>true</verbose>
                     <images>
                         <image>
-                            <name>${server.docker.glassfish.repository}</name>
+                            <name>${gf.docker.server.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
-                                        <platform>${server.docker.platforms}</platform>
+                                        <platform>${gf.docker.platforms}</platform>
                                     </platforms>
                                 </buildx>
                                 <tags>
-                                    <tag>${server.docker.glassfish.tag}</tag>
+                                    <tag>${gf.docker.server.tag}</tag>
                                 </tags>
                                 <cleanup>none</cleanup>
                                 <noCache>true</noCache>
-                                <dockerFile>${server.images.dir}/${server.docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <dockerFile>${gf.docker.server.dir.target}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
                         <image>
-                            <name>${embedded.docker.glassfish.repository}</name>
+                            <name>${gf.docker.embedded.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
-                                        <platform>${embedded.docker.platforms}</platform>
+                                        <platform>${gf.docker.platforms}</platform>
                                     </platforms>
                                 </buildx>
                                 <tags>
-                                    <tag>${embedded.docker.glassfish.tag}</tag>
+                                    <tag>${gf.docker.embedded.tag}</tag>
                                 </tags>
                                 <cleanup>none</cleanup>
                                 <noCache>true</noCache>
-                                <dockerFile>${embedded.images.dir}/${embedded.docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <dockerFile>${gf.docker.embedded.dir.target}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
@@ -389,8 +389,8 @@
                     <version>3.5.4</version>
                     <configuration>
                         <systemPropertyVariables>
-                            <server.docker.glassfish.image>${server.docker.glassfish.image}</server.docker.glassfish.image>
-                            <embedded.docker.glassfish.image>${embedded.docker.glassfish.image}</embedded.docker.glassfish.image>
+                            <gf.docker.server.image>${gf.docker.server.image}</gf.docker.server.image>
+                            <gf.docker.embedded.image>${gf.docker.embedded.image}</gf.docker.embedded.image>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>

@@ -1,6 +1,6 @@
-FROM @embedded.docker.baseImage@
+FROM @gf.docker.baseImage@
 
-LABEL org.opencontainers.image.base.name="@embedded.docker.baseImage@"
+LABEL org.opencontainers.image.base.name="@gf.docker.baseImage@"
 LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
 LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
 

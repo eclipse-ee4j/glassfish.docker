@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Contributors to the Eclipse Foundation.
+ * Copyright (c) 2025, 2026 Contributors to the Eclipse Foundation.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0, which is available at
@@ -35,7 +35,7 @@ public class EmbeddedDeploymentIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
-    private final GenericContainer server = new GenericContainer<>(System.getProperty("embedded.docker.glassfish.image"))
+    private final GenericContainer server = new GenericContainer<>(System.getProperty("gf.docker.embedded.image"))
         .withExposedPorts(8080)
         .withFileSystemBind("target/test-classes/application-test.war", "/deploy/application.war", BindMode.READ_ONLY)
         .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)))
