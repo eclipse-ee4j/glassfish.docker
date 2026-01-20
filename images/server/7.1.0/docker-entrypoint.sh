@@ -1,28 +1,28 @@
 #!/bin/bash
-set -e;
+set -e
 
 change_passwords () {
   local PWD_FILE=/tmp/passwordfile
   local COMMAND=
   rm -rf $PWD_FILE
 
-  if [ x"${AS_ADMIN_PASSWORD}" != x ]; then
+  if [ "${AS_ADMIN_PASSWORD}" != "" ] && [ "${AS_ADMIN_PASSWORD}" != "admin" ]; then
     echo -e "AS_ADMIN_PASSWORD=admin\nAS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> $PWD_FILE
-    COMMAND="change-admin-password --passwordfile=${PWD_FILE}"
+    COMMAND="change-admin-password"
     echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
   fi
 
-  if [ x"${AS_ADMIN_MASTERPASSWORD}" != x ]; then
+  if [ "${AS_ADMIN_MASTERPASSWORD}" != "" ] && [ "${AS_ADMIN_MASTERPASSWORD}" != "changeit" ]; then
     echo -e "AS_ADMIN_MASTERPASSWORD=changeit\nAS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" >> ${PWD_FILE}
-    COMMAND="${COMMAND}
-change-master-password --passwordfile=${PWD_FILE} --savemasterpassword=true"
+    COMMAND="${COMMAND}\nchange-master-password --savemasterpassword=true"
   fi
 
-  if [ x"${COMMAND}" != x ]; then
-    printf "${COMMAND}" | asadmin --interactive=false
+  if [ "${COMMAND}" != "" ]; then
+    echo -e "${COMMAND}" | asadmin --interactive=false --passwordfile=${PWD_FILE} 
   fi
 
   rm -rf ${PWD_FILE}
+  history -c
 }
 
 change_passwords
@@ -36,20 +36,8 @@ if [ -f custom/init.asadmin ]; then
 fi
 
 
-if [ "$1" != 'asadmin' -a "$1" != 'startserv' -a "$1" != 'runembedded' ]; then
+if [ "$1" != 'asadmin' -a "$1" != 'startserv' ]; then
     exec "$@"
-fi
-
-if [ "$1" == 'runembedded' ]; then
-  shift 1
-  if [[ "$SUSPEND" == true ]]
-    then 
-      JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009 $JVM_OPTS"
-  elif [[ "$DEBUG" == true ]]
-    then
-      JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009 $JVM_OPTS"
-  fi
-  exec java $JVM_OPTS -jar glassfish/lib/embedded/glassfish-embedded-static-shell.jar "$@"
 fi
 
 CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED_PLACEHOLDER"
@@ -57,6 +45,10 @@ if [ ! -f "$CONTAINER_ALREADY_STARTED" ]
 then
     touch "$CONTAINER_ALREADY_STARTED" &&
     rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus || true
+fi
+
+if [ "${AS_TRACE}" == true ]; then
+    env|sort
 fi
 
 if [ "$1" == 'startserv' ]; then
@@ -72,4 +64,4 @@ on_exit () {
 }
 trap on_exit EXIT
 
-env|sort && "$@" & wait
+"$@" & wait

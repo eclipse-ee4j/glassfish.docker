@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  */
-package org.glassfish.main.distributions.docker;
+package org.glassfish.main.distributions.docker.server;
 
 import java.net.http.HttpResponse;
 
@@ -22,11 +22,11 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.glassfish.main.distributions.docker.HttpUtilities.getServerDefaultRoot;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.glassfish.main.distributions.docker.HttpUtilities.getAdminResource;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getAdminResource;
 
 /**
  *
@@ -37,7 +37,7 @@ public class ChangePasswordsIT {
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
-    private final GenericContainer server = new GenericContainer<>(System.getProperty("docker.glassfish.image"))
+    private final GenericContainer server = new GenericContainer<>(System.getProperty("server.docker.glassfish.image"))
             .withExposedPorts(8080, 4848)
             .withEnv("AS_ADMIN_MASTERPASSWORD", "mymasterpassword")
             .withEnv("AS_ADMIN_PASSWORD", "myadminpassword")

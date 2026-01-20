@@ -1,12 +1,12 @@
-FROM @docker.baseImage@
+FROM eclipse-temurin:21-jdk
 
-LABEL org.opencontainers.image.base.name="@docker.baseImage@"
+LABEL org.opencontainers.image.base.name="eclipse-temurin:21-jdk"
 LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
 LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
 
 LABEL org.opencontainers.image.title="Eclipse GlassFish"
 LABEL org.opencontainers.image.description="The Official Eclipse GlassFish Docker Image"
-LABEL org.opencontainers.image.version="@glassfish.version@"
+LABEL org.opencontainers.image.version="7.1.0"
 
 LABEL org.opencontainers.image.authors="glassfish-dev@eclipse.org"
 LABEL org.opencontainers.image.vendor="Eclipse Foundation"
@@ -28,8 +28,8 @@ ENV AS_USER=${AS_ADMIN_USER} \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
     AS_STOP_TIMEOUT=9500 \
-    GLASSFISH_DOWNLOAD_SHA512=@glassfish.zip.sha512@ \
-    GLASSFISH_VERSION=@glassfish.version@ \
+    GLASSFISH_DOWNLOAD_SHA512=843e5303e7369957ac251ffe326dba0a83f874894cc1983637ac8c2f52fab21f46bc49ce5c3c341d76263d8e9dad8ac53a5befcea69efe5f28f4b8083cfcf150 \
+    GLASSFISH_VERSION=7.1.0 \
     PATH_GF_BIN=${PATH_GF_HOME}/bin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"
@@ -74,7 +74,7 @@ RUN true \
     && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
-    && mkdir ${PATH_GF_HOME}/autodeploy \
+    && ln -s "${PATH_GF_HOME}/glassfish/domains/domain1/autodeploy" /deploy \
     && echo "Installation was successful."
 
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
