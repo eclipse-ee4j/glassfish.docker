@@ -62,7 +62,7 @@ jobs:
       - name: Build and Deploy
         uses: docker/build-push-action@v6
         with:
-          context: images/server/${{ github.event.inputs.gfVersion }}
+          context: images/embedded/${{ github.event.inputs.gfVersion }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ github.event.inputs.gfVersion }},${{ env.IMAGE_ID }}:latest
