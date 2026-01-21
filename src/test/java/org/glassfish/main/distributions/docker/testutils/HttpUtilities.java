@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025, 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0, which is available at
@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -34,6 +33,7 @@ import org.glassfish.main.distributions.docker.server.UserPassword;
 import org.testcontainers.containers.GenericContainer;
 
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Duration.ofSeconds;
 
 /**
@@ -42,6 +42,23 @@ import static java.time.Duration.ofSeconds;
  */
 public final class HttpUtilities {
 
+    private static final TrustManager[] NAIVE_TRUST_MANAGERS = new TrustManager[] {new X509TrustManager() {
+
+        @Override
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        @Override
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
+
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
+    }};
+
+
     private HttpUtilities() {
     }
 
@@ -49,7 +66,7 @@ public final class HttpUtilities {
         URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + "/");
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri).build();
-            return client.send(request, ofString(StandardCharsets.UTF_8));
+            return client.send(request, ofString(UTF_8));
         }
     }
 
@@ -57,7 +74,7 @@ public final class HttpUtilities {
         URI uri = URI.create("http://localhost:" + server.getMappedPort(8080) + "/");
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri).build();
-            return client.send(request, ofString(StandardCharsets.UTF_8));
+            return client.send(request, ofString(UTF_8));
         }
     }
 
@@ -71,7 +88,7 @@ public final class HttpUtilities {
         while ((System.currentTimeMillis() - startTime) < Duration.ofSeconds(30).toMillis()) {
             try (HttpClient client = newInsecureHttpClient()) {
                 final HttpRequest request = HttpRequest.newBuilder(uri).build();
-                response = client.send(request, ofString(StandardCharsets.UTF_8));
+                response = client.send(request, ofString(UTF_8));
 
                 if (response.statusCode() == 200) {
                     return response;
@@ -90,13 +107,13 @@ public final class HttpUtilities {
             final HttpRequest request = HttpRequest.newBuilder(uri)
                     .setHeader("Authorization", basicAuthValue(userPass))
                     .build();
-            return client.send(request, ofString(StandardCharsets.UTF_8));
+            return client.send(request, ofString(UTF_8));
         }
     }
 
     private static HttpClient newInsecureHttpClient() throws KeyManagementException, NoSuchAlgorithmException {
         SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustAllCerts, new SecureRandom());
+        sslContext.init(null, NAIVE_TRUST_MANAGERS, new SecureRandom());
         HttpClient client = HttpClient.newBuilder()
                 .sslContext(sslContext)
                 .build();
@@ -108,24 +125,4 @@ public final class HttpUtilities {
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
         return basicAuth;
     }
-
-    private static final TrustManager[] trustAllCerts = new TrustManager[]{
-        new X509TrustManager() {
-            @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            @Override
-            public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-            }
-
-            @Override
-            public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-            }
-        }
-    };
-
 }

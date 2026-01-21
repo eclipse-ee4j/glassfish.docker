@@ -1,6 +1,6 @@
-FROM @server.docker.baseImage@
+FROM @gf.docker.baseImage@
 
-LABEL org.opencontainers.image.base.name="@server.docker.baseImage@"
+LABEL org.opencontainers.image.base.name="@gf.docker.baseImage@"
 LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
 LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
 
@@ -71,6 +71,7 @@ RUN true \
     && asadmin set-log-attributes org.glassfish.main.jul.handler.GlassFishLogHandler.enabled=false \
     && asadmin set-log-attributes org.glassfish.main.jul.handler.SimpleLogHandler.level=FINEST \
     && asadmin enable-secure-admin \
+    && sleep 1 \
     && asadmin stop-domain --kill \
     && rm -f ${PATH_GF_SERVER_LOG} ${PATH_GF_PASSWORD_FILE_FOR_CHANGE} \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \

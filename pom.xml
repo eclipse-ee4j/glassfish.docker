@@ -12,25 +12,25 @@
 
     <properties>
         <glassfish.version>7.1.0</glassfish.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <server.docker.platforms>linux/amd64,linux/arm64</server.docker.platforms>
-        <server.docker.glassfish.tag>${glassfish.version}</server.docker.glassfish.tag>
-        <server.docker.baseImage>eclipse-temurin:21-jdk</server.docker.baseImage>
-        <server.docker.glassfish.repository>glassfish</server.docker.glassfish.repository>
-        <server.docker.glassfish.image>${server.docker.glassfish.repository}:${server.docker.glassfish.tag}</server.docker.glassfish.image>
-        <server.relative.dir>images/server</server.relative.dir>
-        <server.images.dir>${basedir}/${server.relative.dir}</server.images.dir>
-        <server.resources.dir>src/main/resources/${server.relative.dir}</server.resources.dir>
+        <gf.docker.baseImage>eclipse-temurin:21-jdk</gf.docker.baseImage>
+        <gf.docker.platforms>linux/amd64,linux/arm64</gf.docker.platforms>
 
-        <embedded.docker.platforms>${server.docker.platforms}</embedded.docker.platforms>
-        <embedded.docker.glassfish.tag>${server.docker.glassfish.tag}</embedded.docker.glassfish.tag>
-        <embedded.docker.baseImage>${server.docker.baseImage}</embedded.docker.baseImage>
-        <embedded.docker.glassfish.repository>embedded-glassfish</embedded.docker.glassfish.repository>
-        <embedded.docker.glassfish.image>${embedded.docker.glassfish.repository}:${embedded.docker.glassfish.tag}</embedded.docker.glassfish.image>
-        <embedded.relative.dir>images/embedded</embedded.relative.dir>
-        <embedded.images.dir>${basedir}/${embedded.relative.dir}</embedded.images.dir>
-        <embedded.resources.dir>src/main/resources/${embedded.relative.dir}</embedded.resources.dir>
+        <gf.docker.embedded.dir.relative>images/embedded</gf.docker.embedded.dir.relative>
+        <gf.docker.embedded.dir.target>${basedir}/${gf.docker.embedded.dir.relative}/${gf.docker.embedded.tag}</gf.docker.embedded.dir.target>
+        <gf.docker.embedded.dir.source>src/main/resources/${gf.docker.embedded.dir.relative}</gf.docker.embedded.dir.source>
+        <gf.docker.embedded.repository>embedded-glassfish</gf.docker.embedded.repository>
+        <gf.docker.embedded.tag>${gf.docker.server.tag}</gf.docker.embedded.tag>
+        <gf.docker.embedded.image>${gf.docker.embedded.repository}:${gf.docker.embedded.tag}</gf.docker.embedded.image>
+
+        <gf.docker.server.dir.relative>images/server</gf.docker.server.dir.relative>
+        <gf.docker.server.dir.source>src/main/resources/${gf.docker.server.dir.relative}</gf.docker.server.dir.source>
+        <gf.docker.server.dir.target>${basedir}/${gf.docker.server.dir.relative}/${gf.docker.server.tag}</gf.docker.server.dir.target>
+        <gf.docker.server.repository>glassfish</gf.docker.server.repository>
+        <gf.docker.server.tag>${glassfish.version}</gf.docker.server.tag>
+        <gf.docker.server.image>${gf.docker.server.repository}:${gf.docker.server.tag}</gf.docker.server.image>
     </properties>
 
     <dependencies>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.12.1</version>
+            <version>6.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.21.4</version>
+            <version>2.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -70,7 +70,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.5.0</version>
                 <configuration>
                     <rules>
                         <requireMavenVersion>
@@ -89,7 +88,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
                     <outputDirectory>${project.build.directory}</outputDirectory>
                     <stripVersion>true</stripVersion>
@@ -121,7 +119,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>server.computeSha512</id>
@@ -161,7 +158,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.2.1</version>
                 <executions>
                     <execution>
                         <id>server.load-sha512</id>
@@ -191,12 +187,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <configuration>
-                    <delimiters>@</delimiters>
-                    <encoding>UTF-8</encoding>
-                    <overwrite>true</overwrite>
-                </configuration>
                 <executions>
                     <execution>
                         <id>filter-server-dockerfile</id>
@@ -205,10 +195,10 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${server.images.dir}/${server.docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${gf.docker.server.dir.target}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${server.resources.dir}</directory>
+                                    <directory>${gf.docker.server.dir.source}</directory>
                                     <includes>
                                         <include>Dockerfile</include>
                                         <include>dockerlibfile-fragment.txt</include>
@@ -217,7 +207,7 @@
                                     <filtering>true</filtering>
                                 </resource>
                                 <resource>
-                                    <directory>${server.resources.dir}</directory>
+                                    <directory>${gf.docker.server.dir.source}</directory>
                                     <includes>
                                         <include>docker-entrypoint.sh</include>
                                     </includes>
@@ -233,10 +223,10 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${embedded.images.dir}/${embedded.docker.glassfish.tag}</outputDirectory>
+                            <outputDirectory>${gf.docker.embedded.dir.target}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${embedded.resources.dir}</directory>
+                                    <directory>${gf.docker.embedded.dir.source}</directory>
                                     <includes>
                                         <include>Dockerfile</include>
                                     </includes>
@@ -250,7 +240,6 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.45.1</version>
                 <executions>
                     <execution>
                         <id>build-docker-image</id>
@@ -264,41 +253,59 @@
                     <verbose>true</verbose>
                     <images>
                         <image>
-                            <name>${server.docker.glassfish.repository}</name>
+                            <name>${gf.docker.server.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
-                                        <platform>${server.docker.platforms}</platform>
+                                        <platform>${gf.docker.platforms}</platform>
                                     </platforms>
                                 </buildx>
                                 <tags>
-                                    <tag>${server.docker.glassfish.tag}</tag>
+                                    <tag>${gf.docker.server.tag}</tag>
                                 </tags>
                                 <cleanup>none</cleanup>
-                                <noCache>false</noCache>
-                                <dockerFile>${server.images.dir}/${server.docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <noCache>true</noCache>
+                                <dockerFile>${gf.docker.server.dir.target}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
                         <image>
-                            <name>${embedded.docker.glassfish.repository}</name>
+                            <name>${gf.docker.embedded.repository}</name>
                             <build>
                                 <buildx>
                                     <platforms>
-                                        <platform>${embedded.docker.platforms}</platform>
+                                        <platform>${gf.docker.platforms}</platform>
                                     </platforms>
                                 </buildx>
                                 <tags>
-                                    <tag>${embedded.docker.glassfish.tag}</tag>
+                                    <tag>${gf.docker.embedded.tag}</tag>
                                 </tags>
                                 <cleanup>none</cleanup>
-                                <noCache>false</noCache>
-                                <dockerFile>${embedded.images.dir}/${embedded.docker.glassfish.tag}/Dockerfile</dockerFile>
+                                <noCache>true</noCache>
+                                <dockerFile>${gf.docker.embedded.dir.target}/Dockerfile</dockerFile>
                                 <filter>@</filter>
                             </build>
                         </image>
                     </images>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-test-app</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <configuration>
+                            <warSourceDirectory>src/test/webapp</warSourceDirectory>
+                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                            <warName>application</warName>
+                            <classifier>test</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -319,39 +326,57 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>build-test-app</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <warSourceDirectory>src/test/webapp</warSourceDirectory>
-                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-                            <warName>application</warName>
-                            <classifier>test</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.6.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.9.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.6.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.3.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <configuration>
+                        <delimiters>@</delimiters>
+                        <encoding>UTF-8</encoding>
+                        <overwrite>true</overwrite>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.48.0</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.13.0</version>
+                    <version>3.14.1</version>
                     <configuration>
                         <release>21</release>
                     </configuration>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.5.1</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.4</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -361,11 +386,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.4</version>
                     <configuration>
                         <systemPropertyVariables>
-                            <server.docker.glassfish.image>${server.docker.glassfish.image}</server.docker.glassfish.image>
-                            <embedded.docker.glassfish.image>${embedded.docker.glassfish.image}</embedded.docker.glassfish.image>
+                            <gf.docker.server.image>${gf.docker.server.image}</gf.docker.server.image>
+                            <gf.docker.embedded.image>${gf.docker.embedded.image}</gf.docker.embedded.image>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>
@@ -374,14 +399,14 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.3</version>
+                    <version>3.1.4</version>
                     <configuration>
                         <skip>true</skip>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.3</version>
+                    <version>3.1.4</version>
                     <configuration>
                         <skip>true</skip>
                     </configuration>

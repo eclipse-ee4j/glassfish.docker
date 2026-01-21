@@ -13,13 +13,13 @@
 Run GlassFish with the following command:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 @gf.docker.server.repository@
 ```
 
 Or with a command for a specific tag (GlassFish version):
 
 ```
-docker run -p 8080:8080 -p 4848:4848 @docker.glassfish.image@
+docker run -p 8080:8080 -p 4848:4848 @gf.docker.server.image@
 ```
 
 Open the following URLs in the browser:
@@ -52,13 +52,13 @@ Follow these steps:
 3. Run the following command to start GlassFish in Docker with your application, where `/deployments` is path to the directory created in step 1, and /deploy is the directory in the container where GlassFish expects applications:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 -v /deployments:/deploy @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 -v /deployments:/deploy @gf.docker.server.repository@
 ```
 
 Alternatively, you can mount a specific WAR file directly:
 
 ```
-docker run -p 8080:8080 -p 4848:4848 -v /deployment/application.war:/deploy/application.war @docker.glassfish.repository@
+docker run -p 8080:8080 -p 4848:4848 -v /deployment/application.war:/deploy/application.war @gf.docker.server.repository@
 ```
 
 **Note**: GlassFish Server deploys applications using the WAR filename as the context path (e.g., `application.war` becomes accessible at `/application/`).
@@ -74,7 +74,7 @@ The context root (`application`) is derived from the name of the application fil
 You can modify the start command of the Docker container to `startserv --debug` to enable debug mode. You should also map the debug port 9009.
 
 ```
-docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@ startserv --debug
+docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @gf.docker.server.repository@ startserv --debug
 ```
 
 Then connect your debugger to the port 9009 on `localhost`.
@@ -82,7 +82,7 @@ Then connect your debugger to the port 9009 on `localhost`.
 If you need suspend GlassFish startup until you connect the debugger, use the `--suspend` argument instead:
 
 ```
-docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @docker.glassfish.repository@ startserv --suspend
+docker run -p 9009:9009 -p 8080:8080 -p 4848:4848 @gf.docker.server.repository@ startserv --suspend
 ```
 
 ## Environment variables
@@ -117,7 +117,7 @@ However, always consider to executing any asadmin configuration commands during 
 
 Just create a file `${PATH_GF_HOME}/custom/init.asadmin` (`/opt/glassfish7/custom/init.asadmin`), the commands will be executed before GlassFish server starts.
 
-Within the `init.asadmin` file, you can specify any asadmin command. Most of the commands require that the server is running, so you'll need to start the server first, run the configuration commands, and then stop the server. 
+Within the `init.asadmin` file, you can specify any asadmin command. Most of the commands require that the server is running, so you'll need to start the server first, run the configuration commands, and then stop the server.
 
 For example, to start GlassFish, increase the maximum amount of threads, and then stop it, the `init.asadmin` file can contain:
 
@@ -130,7 +130,7 @@ stop-domain
 You can provide the file by mounting its directory to the `/opt/glassfish7/custom` directory in the container when running the container:
 
 ```
-docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @docker.glassfish.repository@
+docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @gf.docker.server.repository@
 ```
 
 ### Execute a `bash` script before server startup
@@ -156,7 +156,7 @@ stop-domain" | asadmin --interactive=false
 You can provide the script by mounting its directory to the `/opt/glassfish7/custom` directory in the container when running the container:
 
 ```
-docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @docker.glassfish.repository@
+docker run -v ./custom:/opt/glassfish7/custom -p 8080:8080 -ti @gf.docker.server.repository@
 ```
 
 ### Execute `asadmin` commands during Docker image build
@@ -168,7 +168,7 @@ To do it, simply add `RUN instructions that run `asadmin` script with the usual 
 File `Dockerfile`:
 
 ```
-FROM @docker.glassfish.repository@
+FROM @gf.docker.server.repository@
 
 RUN printf "start-domain \n \
     set configs.config.server-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=1000 \n \
@@ -188,7 +188,7 @@ stop-domain
 File `Dockerfile`:
 
 ```
-FROM @docker.glassfish.repository@
+FROM @gf.docker.server.repository@
 
 COPY commands.asadmin commands.asadmin
 
@@ -202,7 +202,7 @@ Let's try something more complicated.
 * To modify startup arguments for GlassFish, just add `startserv` to the command line and then add any arguments supported by the `asadmin start-domain` command. The `startserv` script is an alias to the `asadmin start-domain` command but starts GlassFish in a more efficient way that is more suitable in Docker container. For example, to start in debug mode with a custom domain, run:
 
 ```bash
-docker run @docker.glassfish.repository@ startserv --debug mydomain
+docker run @gf.docker.server.repository@ startserv --debug mydomain
 ```
 
 * Environment variable `AS_TRACE=true` enables tracing of the GlassFish startup. It is useful when the server doesn't start without any useful logs.
@@ -212,13 +212,13 @@ docker run @docker.glassfish.repository@ startserv --debug mydomain
 * `docker run` with `-d` starts the container as a daemon, so the shell doesn't print logs and finishes. Docker then returns the container id which you can use for further commands.
 
 ```bash
-docker run -d @docker.glassfish.repository@
+docker run -d @gf.docker.server.repository@
 ```
 
 Example of running a Docker container in background, view the logs, and then stop it (with debug enabled, trace logging, and user `1000` convenient for Kubernetes ):
 
 ```bash
-docker run -d -e AS_TRACE=true --user 1000 @docker.glassfish.repository@ startserv --debug=true
+docker run -d -e AS_TRACE=true --user 1000 @gf.docker.server.repository@ startserv --debug=true
 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
 
 docker logs 5a11f2fe1a9dd1569974de913a181847aa22165b5015ab20b271b08a27426e72
@@ -242,7 +242,7 @@ If you want to run more complicated tests, the good path is to
 public class WelcomePageITest {
 
     @Container
-    private final GenericContainer server = new GenericContainer<>("@docker.glassfish.image@").withExposedPorts(8080);
+    private final GenericContainer server = new GenericContainer<>("@gf.docker.server.image@").withExposedPorts(8080);
 
     @Test
     void getRoot() throws Exception {
