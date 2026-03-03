@@ -1,12 +1,12 @@
-FROM @gf.docker.baseImage@
+FROM eclipse-temurin:21-jdk
 
-LABEL org.opencontainers.image.base.name="@gf.docker.baseImage@"
+LABEL org.opencontainers.image.base.name="eclipse-temurin:21-jdk"
 LABEL org.opencontainers.image.source="https://github.com/eclipse-ee4j/glassfish.docker"
 LABEL org.opencontainers.image.url="https://github.com/eclipse-ee4j/glassfish.docker/wiki"
 
 LABEL org.opencontainers.image.title="Eclipse GlassFish"
 LABEL org.opencontainers.image.description="The Official Eclipse GlassFish Docker Image"
-LABEL org.opencontainers.image.version="@glassfish.version@"
+LABEL org.opencontainers.image.version="8.0.0"
 
 LABEL org.opencontainers.image.authors="glassfish-dev@eclipse.org"
 LABEL org.opencontainers.image.vendor="Eclipse Foundation"
@@ -28,8 +28,8 @@ ENV AS_USER=${AS_ADMIN_USER} \
     AS_TRACE_LOGGING=false \
     AS_TRACE_BOOTSTRAP=false \
     AS_STOP_TIMEOUT=9500 \
-    GLASSFISH_DOWNLOAD_SHA512=@server.sha512@ \
-    GLASSFISH_VERSION=@glassfish.version@ \
+    GLASSFISH_DOWNLOAD_SHA512=08bcf11f65990e4ded23a1005ed8578fd6317a26c9d0bddd7772068a8a902aa7c593b3fe9ec315cafe7d0b1b9610fc3cf6da2de306278db854d744c27d7799e8 \
+    GLASSFISH_VERSION=8.0.0 \
     PATH_GF_BIN=${PATH_GF_HOME}/bin \
     PATH_GF_SERVER_LOG="${PATH_GF_HOME}/glassfish/domains/domain1/logs/server.log"
 ENV PATH="${PATH_GF_BIN}:${PATH}"

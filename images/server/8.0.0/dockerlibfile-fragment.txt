@@ -1,0 +1,3 @@
+Tags: 8.0.0, 8.0.0-jdk21, 8.0.0-jdk21-eclipse-temurin
+Architectures: amd64, arm64v8
+Directory: images/server/8.0.0
