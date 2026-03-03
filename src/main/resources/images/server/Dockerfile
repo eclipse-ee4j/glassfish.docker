@@ -19,7 +19,7 @@ ARG AS_ADMIN_PASSWORD=admin \
     PATH_GF_PASSWORD_FILE_FOR_CHANGE=/password-change.txt \
     UID=1000 \
     GID=1000
-ENV PATH_GF_HOME=/opt/glassfish7 \
+ENV PATH_GF_HOME=/opt/glassfish \
     AS_ADMIN_USER=admin \
     AS_ADMIN_PASSWORDFILE=/password.txt
 ENV AS_USER=${AS_ADMIN_USER} \
@@ -47,8 +47,10 @@ RUN true \
     && rm glassfish.zip.asc \
     && echo "$GLASSFISH_DOWNLOAD_SHA512 glassfish.zip" | sha512sum --strict --check \
     && mkdir -p "${PATH_GF_HOME}" \
-    && unzip -q glassfish.zip -d "${PATH_GF_HOME}/.." \
-    && rm glassfish.zip \
+    && TMPDIR=$(mktemp -d /opt/gfXXXX) \
+    && unzip -q glassfish.zip -d "$TMPDIR" \
+    && cp -r "$TMPDIR"/*/* "${PATH_GF_HOME}/" \
+    && rm -rf "$TMPDIR" glassfish.zip \
     && userdel -r ubuntu \
     && groupadd -g ${GID} glassfish \
     && useradd -r -l -u ${UID} -g ${GID} -d "${PATH_GF_HOME}" -s /bin/bash glassfish \

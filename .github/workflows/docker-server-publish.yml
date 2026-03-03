@@ -6,7 +6,7 @@ on:
       gfVersion:
         description: 'The value of the glassfish.version property, used also to build the image.'
         required: true
-        default: '7.1.0'
+        default: '8.0.0'
       basicImage:
         description: 'The basic docker image'
         required: true
