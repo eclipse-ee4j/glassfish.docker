@@ -17,19 +17,20 @@
 package org.glassfish.main.distributions.docker.server;
 
 import java.net.http.HttpResponse;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
 import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getApplication;
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.testcontainers.containers.BindMode.READ_ONLY;
 
 @Testcontainers
 public class StartAndDeployIT {
@@ -39,8 +40,8 @@ public class StartAndDeployIT {
     private final GenericContainer server = new GenericContainer<>(System.getProperty("gf.docker.server.image"))
         .withCommand("startserv")
         .withExposedPorts(8080)
-        .withFileSystemBind("target/test-classes/application-test.war", "/deploy/application-test.war", BindMode.READ_ONLY)
-        .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
+        .withFileSystemBind("target/test-classes/application-test.war", "/deploy/application-test.war", READ_ONLY)
+        .withLogConsumer(o -> System.err.print("GF: " + LocalTime.now() + ": " + o.getUtf8String()));
 
     @Test
     void rootResourceGivesOkWithDefaultResponse() throws Exception {

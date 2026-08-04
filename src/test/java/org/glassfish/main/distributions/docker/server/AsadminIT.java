@@ -16,6 +16,7 @@
 package org.glassfish.main.distributions.docker.server;
 
 import java.net.http.HttpResponse;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -36,8 +37,8 @@ public class AsadminIT {
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("gf.docker.server.image"))
-            .withCommand("asadmin", "start-domain").withExposedPorts(8080)
-            .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
+        .withCommand("asadmin", "start-domain").withExposedPorts(8080)
+        .withLogConsumer(o -> System.err.print("GF: " + LocalTime.now() + ": " + o.getUtf8String()));
 
     @Test
     void rootResourceGivesOkWithDefaultResponse() throws Exception {

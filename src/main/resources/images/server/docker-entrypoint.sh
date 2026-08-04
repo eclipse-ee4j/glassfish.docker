@@ -1,50 +1,71 @@
-#!/bin/bash
-set -e
+#!/bin/bash -ex
 
-change_passwords () {
-    local PATH_GF_PASSWORD_FILE_FOR_CHANGE=/tmp/passwordfile
-    local COMMAND=""
-    rm -f "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}"
-
-    if [ "${AS_ADMIN_PASSWORD}" != "" ] && [ "${AS_ADMIN_PASSWORD}" != "admin" ]; then
-        echo -e "AS_ADMIN_PASSWORD=admin" > "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}"
-        echo -e "AS_ADMIN_NEWPASSWORD=${AS_ADMIN_PASSWORD}" >> "${PATH_GF_PASSWORD_FILE_FOR_CHANGE}"
-        COMMAND="change-admin-password"
+create_domain() {
+    local AS_PASSWORDFILE_CHANGE=/tmp/passwordfile
+    local SAVE_MASTER_PASSWORD;
+    echo -e "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORDFILE_CHANGE}"
+    if [ "${AS_ADMIN_MASTERPASSWORD}" == "" ] || [ "${AS_ADMIN_MASTERPASSWORD}" == "changeit" ]; then
+        SAVE_MASTER_PASSWORD=false
+        echo -e "AS_ADMIN_MASTERPASSWORD=changeit" >> ${AS_PASSWORDFILE_CHANGE}
+    else
+        SAVE_MASTER_PASSWORD=true
+        echo -e "AS_ADMIN_MASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" >> ${AS_PASSWORDFILE_CHANGE}
     fi
+    echo -e "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_ADMIN_PASSWORDFILE}"
+    asadmin --passwordfile "${AS_PASSWORDFILE_CHANGE}" create-domain --savemasterpassword ${SAVE_MASTER_PASSWORD} --keytooloptions CN="${AS_HOSTNAME}" "${AS_DOMAIN_NAME}"
+    rm -rf "${PATH_GF_DOMAIN}/autodeploy"
+    ln -s /deploy "${PATH_GF_DOMAIN}/autodeploy"
 
-    if [ "${AS_ADMIN_MASTERPASSWORD}" != "" ] && [ "${AS_ADMIN_MASTERPASSWORD}" != "changeit" ]; then
-        echo -e "AS_ADMIN_MASTERPASSWORD=changeit" >> ${PATH_GF_PASSWORD_FILE_FOR_CHANGE}
-        echo -e "AS_ADMIN_NEWMASTERPASSWORD=${AS_ADMIN_MASTERPASSWORD}" >> ${PATH_GF_PASSWORD_FILE_FOR_CHANGE}
-        COMMAND+="\nchange-master-password --savemasterpassword=true"
+    asadmin start-domain ${AS_DOMAIN_NAME}
+    local AS_COMMANDFILE=/tmp/commandfile
+    echo -e "\
+      set-log-attributes org.glassfish.main.jul.handler.GlassFishLogHandler.enabled=false\n
+      set-log-attributes org.glassfish.main.jul.handler.SimpleLogHandler.level=FINEST\n
+    " > "${AS_COMMANDFILE}"
+    if [ "${AS_ADMIN_PASSWORD}" != "" ]; then
+        echo -e "enable-secure-admin\n" >> "${AS_COMMANDFILE}"
     fi
-
-    if [ "${COMMAND}" != "" ]; then
-        echo -e "${COMMAND}" | asadmin --interactive=false --passwordfile=${PATH_GF_PASSWORD_FILE_FOR_CHANGE}
-        echo "AS_ADMIN_PASSWORD=${AS_ADMIN_PASSWORD}" > "${AS_PASSWORD_FILE}"
-    fi
-
-    rm -f ${PATH_GF_PASSWORD_FILE_FOR_CHANGE}
-    unset AS_ADMIN_PASSWORD;
-    unset AS_ADMIN_MASTERPASSWORD;
-    history -c
+    cat "${AS_COMMANDFILE}"
+    asadmin --passwordfile=${AS_ADMIN_PASSWORDFILE} multimode --file "${AS_COMMANDFILE}"
+    sleep 1
+    asadmin --passwordfile=${AS_ADMIN_PASSWORDFILE} stop-domain "${AS_DOMAIN_NAME}"
+    rm -f "${PATH_GF_SERVER_LOG}"
 }
 
 on_exit () {
     EXIT_CODE=$?
     set +e;
-    ps -lAf;
-    asadmin stop-domain --force --kill;
+    asadmin stop-domain --echo --force --kill "${AS_DOMAIN_NAME}"
     exit $EXIT_CODE;
 }
 
-change_passwords
+if [ -d "${PATH_GF_DOMAIN}" ]; then
+    FIRST_RUN=false
+else
+    FIRST_RUN=true
+fi
+
+trap on_exit EXIT
+
+if $FIRST_RUN; then
+    create_domain
+fi
+
+if [ ! "${AS_ADMIN_PASSWORD}" == "" ]; then
+    export AS_ADMIN_SECURE=true
+fi
+
+unset AS_ADMIN_PASSWORD
+unset AS_ADMIN_MASTERPASSWORD
+unset AS_ADMIN_USER
+env | sort
 
 if [ -f custom/init.sh ]; then
     /bin/bash custom/init.sh
 fi
 
 if [ -f custom/init.asadmin ]; then
-    asadmin --interactive=false multimode -f custom/init.asadmin
+    asadmin --passwordfile=${AS_ADMIN_PASSWORDFILE} --interactive=false multimode -f custom/init.asadmin
 fi
 
 
@@ -52,20 +73,15 @@ if [ "$1" != 'asadmin' -a "$1" != 'startserv' ]; then
     exec "$@"
 fi
 
-CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED_PLACEHOLDER"
-if [ ! -f "$CONTAINER_ALREADY_STARTED" ]
-then
-    touch "$CONTAINER_ALREADY_STARTED" && rm -rf glassfish/domains/domain1/autodeploy/.autodeploystatus
+if $FIRST_RUN; then
+    rm -rf "${PATH_GF_DOMAIN}/autodeploy/.autodeploystatus"
+    history -c
 fi
 
-if [ "${AS_TRACE}" == true ]; then
-    env | sort
-fi
-
+echo "STARTING DOMAIN!"
+echo "Name: ${AS_DOMAIN_NAME}, $@"
 if [ "$1" == 'startserv' ]; then
     exec "$@"
 fi
-
-trap on_exit EXIT
 
 "$@" & wait

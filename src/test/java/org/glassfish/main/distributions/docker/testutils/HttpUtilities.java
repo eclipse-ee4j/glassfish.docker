@@ -15,6 +15,7 @@
  */
 package org.glassfish.main.distributions.docker.testutils;
 
+import java.lang.System.Logger;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,6 +33,7 @@ import javax.net.ssl.X509TrustManager;
 import org.glassfish.main.distributions.docker.server.UserPassword;
 import org.testcontainers.containers.GenericContainer;
 
+import static java.lang.System.Logger.Level.INFO;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Duration.ofSeconds;
@@ -41,6 +43,7 @@ import static java.time.Duration.ofSeconds;
  * @author Ondro Mihalyi
  */
 public final class HttpUtilities {
+    private static final Logger LOG = System.getLogger(HttpUtilities.class.getName());
 
     private static final TrustManager[] NAIVE_TRUST_MANAGERS = new TrustManager[] {new X509TrustManager() {
 
@@ -103,6 +106,7 @@ public final class HttpUtilities {
 
     public static HttpResponse<String> getAdminResource(GenericContainer server, String resourcePath, UserPassword userPass) throws Exception {
         URI uri = URI.create("https://localhost:" + server.getMappedPort(4848) + resourcePath);
+        LOG.log(INFO, "Using uri: " + uri);
         try (HttpClient client = newInsecureHttpClient()) {
             final HttpRequest request = HttpRequest.newBuilder(uri)
                     .setHeader("Authorization", basicAuthValue(userPass))

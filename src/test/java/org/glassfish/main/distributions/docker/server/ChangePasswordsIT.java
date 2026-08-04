@@ -16,45 +16,58 @@
 package org.glassfish.main.distributions.docker.server;
 
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Container.ExecResult;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getAdminResource;
 import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getServerDefaultRoot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.glassfish.main.distributions.docker.testutils.HttpUtilities.getAdminResource;
+import static org.testcontainers.containers.wait.strategy.WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT;
 
 /**
- *
  * @author Ondro Mihalyi
  */
 @Testcontainers
 public class ChangePasswordsIT {
 
     private static final String ADMIN_PASSWORD = UUID.randomUUID().toString();
+    private static final String ADMIN_MASTERPASSWORD = "mymasterpassword";
 
     @SuppressWarnings({"rawtypes", "resource"})
     @Container
     private final GenericContainer server = new GenericContainer<>(System.getProperty("gf.docker.server.image"))
         .withExposedPorts(8080, 4848)
-        .withEnv("AS_ADMIN_MASTERPASSWORD", "mymasterpassword")
-        .withEnv("JAVA_OPTIONS",
-              "-Djavax.net.ssl.trustStore=/opt/glassfish7/glassfish/domains/domain1/config/cacerts.jks "
-            + "-Djavax.net.ssl.trustStorePassword=changeit")
+        .withEnv("AS_ADMIN_MASTERPASSWORD", ADMIN_MASTERPASSWORD)
         .withEnv("AS_ADMIN_PASSWORD", ADMIN_PASSWORD)
-        .withLogConsumer(o -> System.err.print("GF: " + o.getUtf8String()));
+        .withEnv("JAVA_OPTIONS",
+            "-Djavax.net.ssl.trustStore=/opt/gfinstall/glassfish/domains/domain1/config/cacerts.jks "
+          + "-Djavax.net.ssl.trustStorePassword=" + ADMIN_MASTERPASSWORD)
+        .waitingFor(new WaitAllStrategy(WITH_MAXIMUM_OUTER_TIMEOUT)
+            .withStrategy(Wait.forLogMessage("^STARTING DOMAIN.*", 1))
+            .withStrategy(Wait.forListeningPorts(4848, 8080))
+            .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
+        .withLogConsumer(o -> System.err.print("GF: " + LocalTime.now() + ": " + o.getUtf8String()));
 
     @Test
     void rootResourceGivesOkWithDefaultResponse() throws Exception {
         final HttpResponse<String> defaultRootResponse = getServerDefaultRoot(server);
-        assertEquals(200, defaultRootResponse.statusCode(), "Response status code");
-        assertThat(defaultRootResponse.body(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"));
+        assertAll(
+            () -> assertEquals(200, defaultRootResponse.statusCode(), "Response status code"),
+            () -> assertThat(defaultRootResponse.body(), stringContainsInOrder("Eclipse GlassFish", "index.html", "production-quality"))
+        );
     }
 
     @Test
@@ -66,8 +79,10 @@ public class ChangePasswordsIT {
 
     @Test
     void customAdminPassword_asadmin() throws Exception {
-        ExecResult result = server.execInContainer("asadmin", "--passwordfile", "/password.txt", "get", "*");
-        assertEquals(0, result.getExitCode());
-        assertThat(result.getStderr(), result.getStdout(), stringContainsInOrder("servers.server.server.name=server"));
+        ExecResult result = server.execInContainer("asadmin", "--passwordfile", "/opt/gfinstall/password.txt", "get", "*");
+        assertAll(
+            () -> assertEquals(0, result.getExitCode(), "Exit code"),
+            () -> assertThat(result.getStderr(), result.getStdout(), stringContainsInOrder("servers.server.server.name=server"))
+        );
     }
 }
