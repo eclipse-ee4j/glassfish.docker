@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 create_domain() {
     local AS_PASSWORDFILE_CHANGE=/tmp/passwordfile
