@@ -42,8 +42,8 @@ RUN true \
     && set -x \
     && TMPDIR=$(mktemp -d /opt/gfXXXX) \
     && cd "$TMPDIR" \
-    && curl -fL "@gf.docker.mavenUrl@/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-@gf.docker.server.versionId@.zip" -o glassfish.zip \
-    && curl -fL "@gf.docker.mavenUrl@/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-@gf.docker.server.versionId@.zip.asc" -o glassfish.zip.asc \
+    && curl -fL "@gf.docker.server.mavenUrl@.asc" -o glassfish.zip.asc \
+    && curl -fL "@gf.docker.server.mavenUrl@" -o glassfish.zip \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish.zip.asc glassfish.zip \

@@ -18,13 +18,16 @@
         <gf.docker.baseImage>eclipse-temurin:21-jdk</gf.docker.baseImage>
         <gf.docker.platforms>linux/amd64,linux/arm64</gf.docker.platforms>
 
+        <gf.docker.mavenUrl>https://repo1.maven.org/maven2</gf.docker.mavenUrl>
+
         <gf.docker.embedded.dir.relative>images/embedded</gf.docker.embedded.dir.relative>
         <gf.docker.embedded.dir.target>${basedir}/${gf.docker.embedded.dir.relative}/${gf.docker.embedded.tag}</gf.docker.embedded.dir.target>
         <gf.docker.embedded.dir.source>src/main/resources/${gf.docker.embedded.dir.relative}</gf.docker.embedded.dir.source>
         <gf.docker.embedded.repository>embedded-glassfish</gf.docker.embedded.repository>
         <gf.docker.embedded.tag>${gf.docker.server.tag}</gf.docker.embedded.tag>
         <gf.docker.embedded.image>${gf.docker.embedded.repository}:${gf.docker.embedded.tag}</gf.docker.embedded.image>
-        <gf.docker.embedded.versionId>${glassfish.version}</gf.docker.embedded.versionId>
+        <gf.docker.embedded.mavenArtifactVersionId>${glassfish.version}</gf.docker.embedded.mavenArtifactVersionId>
+        <gf.docker.embedded.mavenUrl>${gf.docker.mavenUrl}/org/glassfish/main/extras/glassfish-embedded-all/${glassfish.version}/glassfish-embedded-all-${gf.docker.embedded.mavenArtifactVersionId}.jar</gf.docker.embedded.mavenUrl>
 
         <gf.docker.server.dir.relative>images/server</gf.docker.server.dir.relative>
         <gf.docker.server.dir.source>src/main/resources/${gf.docker.server.dir.relative}</gf.docker.server.dir.source>
@@ -32,9 +35,8 @@
         <gf.docker.server.repository>glassfish</gf.docker.server.repository>
         <gf.docker.server.tag>${glassfish.version}</gf.docker.server.tag>
         <gf.docker.server.image>${gf.docker.server.repository}:${gf.docker.server.tag}</gf.docker.server.image>
-        <gf.docker.server.versionId>${glassfish.version}</gf.docker.server.versionId>
-
-        <gf.docker.mavenUrl>https://repo1.maven.org/maven2</gf.docker.mavenUrl>
+        <gf.docker.server.mavenArtifactVersionId>${glassfish.version}</gf.docker.server.mavenArtifactVersionId>
+        <gf.docker.server.mavenUrl>${gf.docker.mavenUrl}/org/glassfish/main/distributions/glassfish/${glassfish.version}/glassfish-${gf.docker.server.mavenArtifactVersionId}.zip</gf.docker.server.mavenUrl>
     </properties>
 
     <dependencies>
