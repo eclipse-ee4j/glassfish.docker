@@ -42,8 +42,8 @@ RUN true \
     && set -x \
     && TMPDIR=$(mktemp -d /opt/gfXXXX) \
     && cd "$TMPDIR" \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-8.0.4.zip" -o glassfish.zip \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/${GLASSFISH_VERSION}/glassfish-8.0.4.zip.asc" -o glassfish.zip.asc \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/8.0.4/glassfish-8.0.4.zip.asc" -o glassfish.zip.asc \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/8.0.4/glassfish-8.0.4.zip" -o glassfish.zip \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish.zip.asc glassfish.zip \

@@ -25,8 +25,8 @@ ENV GLASSFISH_DOWNLOAD_SHA512=5f8dbc961f6555acf541b29e4f5d10b86396644c89334ed55b
 RUN true \
     && set -x \
     && mkdir -p "${PATH_GF_HOME}" \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/extras/glassfish-embedded-all/${GLASSFISH_VERSION}/glassfish-embedded-all-8.0.4.jar.asc" -o glassfish-embedded-all.jar.asc \
-    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/extras/glassfish-embedded-all/${GLASSFISH_VERSION}/glassfish-embedded-all-8.0.4.jar" -o "${PATH_GF_HOME}"/glassfish-embedded-all.jar \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/extras/glassfish-embedded-all/8.0.4/glassfish-embedded-all-8.0.4.jar.asc" -o glassfish-embedded-all.jar.asc \
+    && curl -fL "https://repo1.maven.org/maven2/org/glassfish/main/extras/glassfish-embedded-all/8.0.4/glassfish-embedded-all-8.0.4.jar" -o "${PATH_GF_HOME}"/glassfish-embedded-all.jar \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
     && gpg --batch --verify glassfish-embedded-all.jar.asc "${PATH_GF_HOME}"/glassfish-embedded-all.jar \
