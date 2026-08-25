@@ -25,7 +25,7 @@ ENV GLASSFISH_DOWNLOAD_SHA512=@embedded.sha512@ \
 RUN true \
     && set -x \
     && mkdir -p "${PATH_GF_HOME}" \
-    && curl -fL "@gf.docker.mavenUrl@/org/glassfish/main/extras/glassfish-embedded-all/${GLASSFISH_VERSION}/glassfish-embedded-all-@gf.docker.embedded.versionId@.jar.asc" -o glassfish-embedded-all.jar.asc \
+    && curl -fL "@gf.docker.mavenUrl@/org/glassfish/main/extras/glassfish-embedded-all/@gf.docker.embedded.versionId@/glassfish-embedded-all-@gf.docker.embedded.versionId@.jar.asc" -o glassfish-embedded-all.jar.asc \
     && curl -fL "@gf.docker.mavenUrl@/org/glassfish/main/extras/glassfish-embedded-all/${GLASSFISH_VERSION}/glassfish-embedded-all-@gf.docker.embedded.versionId@.jar" -o "${PATH_GF_HOME}"/glassfish-embedded-all.jar \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys D4A77129F00F736293BE5A51AFC18A2271EDDFE1 \
