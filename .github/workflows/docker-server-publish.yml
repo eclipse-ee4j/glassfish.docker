@@ -6,7 +6,7 @@ on:
       gfVersion:
         description: 'The value of the glassfish.version property, used also to build the image.'
         required: true
-        default: '8.0.2'
+        default: '8.0.4'
       basicImage:
         description: 'The basic docker image'
         required: true
@@ -66,4 +66,3 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ github.event.inputs.gfVersion }},${{ env.IMAGE_ID }}:latest
-
