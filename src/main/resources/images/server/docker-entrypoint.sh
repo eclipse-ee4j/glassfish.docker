@@ -1,5 +1,12 @@
 #!/bin/bash -e
 
+# To allow overridding of everything
+if [ "$1" != 'asadmin' -a "$1" != 'startserv' ]; then
+    exec "$@"
+    EXIT_CODE=$?
+    exit $EXIT_CODE;
+fi
+
 create_domain() {
     local AS_PASSWORDFILE_CHANGE=/tmp/passwordfile
     local SAVE_MASTER_PASSWORD;
@@ -66,11 +73,6 @@ fi
 
 if [ -f custom/init.asadmin ]; then
     asadmin --passwordfile=${AS_ADMIN_PASSWORDFILE} --interactive=false multimode -f custom/init.asadmin
-fi
-
-
-if [ "$1" != 'asadmin' -a "$1" != 'startserv' ]; then
-    exec "$@"
 fi
 
 if $FIRST_RUN; then
