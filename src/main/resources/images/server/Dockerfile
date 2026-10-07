@@ -61,7 +61,7 @@ RUN true \
     && mkdir -p "/deploy/bundles" \
     && chown -R glassfish:glassfish "/deploy" \
     && chown -R glassfish:glassfish "${PATH_GF_HOME}" \
-    && chmod u+x $(find "${PATH_GF_HOME}" -type f -name "asadmin" -o -name "nadmin" -o -name "startserv" -o -name "*.sh") \
+    && chmod u+x $(find "${PATH_GF_HOME}" -type f -name "asadmin" -o -name "nadmin" -o -name "startserv" -o -name "appclient" -o -name "wsimport" -o -name "wsgen" -o -name "*.sh") \
     && chmod -R go-rwx "${PATH_GF_HOME}" \
     && echo "Installation was successful."
 
